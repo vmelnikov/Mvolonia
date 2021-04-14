@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlCatalog", "samples\ControlCatalog\ControlCatalog.csproj", "{19CB5A29-2C13-4FE1-B026-68C60C941E1E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvolonia.Controls", "src\Mvolonia.Controls\Mvolonia.Controls.csproj", "{044C97C5-9887-4762-BEAB-CC56B94C7F77}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{19CB5A29-2C13-4FE1-B026-68C60C941E1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19CB5A29-2C13-4FE1-B026-68C60C941E1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19CB5A29-2C13-4FE1-B026-68C60C941E1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{044C97C5-9887-4762-BEAB-CC56B94C7F77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{044C97C5-9887-4762-BEAB-CC56B94C7F77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{044C97C5-9887-4762-BEAB-CC56B94C7F77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{044C97C5-9887-4762-BEAB-CC56B94C7F77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
