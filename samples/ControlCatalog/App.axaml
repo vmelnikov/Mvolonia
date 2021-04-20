@@ -8,5 +8,6 @@
 
     <Application.Styles>
         <FluentTheme Mode="Light"/>
+        <StyleInclude Source="avares://Mvolonia.Controls/Themes/Default.axaml"/>
     </Application.Styles>
 </Application>
