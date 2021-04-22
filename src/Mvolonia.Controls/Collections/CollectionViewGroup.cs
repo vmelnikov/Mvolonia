@@ -6,7 +6,7 @@ namespace Mvolonia.Controls.Collections
     /// <summary>
     /// A CollectionViewGroup, as created by a CollectionView according to a GroupDescription.
     /// </summary>
-    public abstract class CollectionViewGroup: INotifyPropertyChanged
+    internal abstract class CollectionViewGroup: INotifyPropertyChanged
     {
         private readonly object _key;
 
