@@ -1,41 +1,53 @@
-<Styles xmlns="https://github.com/avaloniaui" 
+<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:c="clr-namespace:Mvolonia.Controls;assembly=Mvolonia.Controls">
-  <Design.PreviewWith>
-    <Border Padding="20">
-      <c:GroupingListBox>
-        <ListBoxItem>Test</ListBoxItem>
-        <ListBoxItem>Test</ListBoxItem>
-        <ListBoxItem>Test</ListBoxItem>
-        <ListBoxItem>Test</ListBoxItem>
-      </c:GroupingListBox>
-    </Border>
-  </Design.PreviewWith>
-  <Style Selector="c|GroupingListBox">
-    <Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
-    <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
-    <Setter Property="BorderThickness" Value="{DynamicResource ListBoxBorderThemeThickness}" />
-    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />        
-    <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />    
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Border Name="border" BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}">
-          <ScrollViewer Name="PART_ScrollViewer"
-                        Background="{TemplateBinding Background}"
-                        HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
-                        VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
-            <ItemsPresenter Name="PART_ItemsPresenter"
-                            Items="{TemplateBinding Items}"
-                            ItemsPanel="{TemplateBinding ItemsPanel}"
-                            ItemTemplate="{TemplateBinding ItemTemplate}"
-                            Margin="{TemplateBinding Padding}"
-                            VirtualizationMode="{TemplateBinding VirtualizationMode}"/>
-          </ScrollViewer>
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <c:GroupingListBox>
+                <ListBoxItem>Test</ListBoxItem>
+                <ListBoxItem>Test</ListBoxItem>
+                <ListBoxItem>Test</ListBoxItem>
+                <ListBoxItem>Test</ListBoxItem>
+            </c:GroupingListBox>
         </Border>
-      </ControlTemplate>
-    </Setter>
-  </Style>
+    </Design.PreviewWith>
+    <Style Selector="c|GroupingListBox">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ListBoxBorderThemeThickness}" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="border" BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                    <ScrollViewer Name="PART_ScrollViewer"
+                                  Background="{TemplateBinding Background}"
+                                  HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                  VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                        Items="{TemplateBinding Items}"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                                        ItemTemplate="{TemplateBinding ItemTemplate}"
+                                        Margin="{TemplateBinding Padding}"
+                                        VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="c|GroupItem">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel>
+                    <ContentPresenter Name="PART_Header" />
+                    <ItemsPresenter 
+                        Items="{TemplateBinding Items}" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 </Styles>
