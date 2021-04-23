@@ -29,7 +29,7 @@ namespace Mvolonia.Controls.Collections
 
         public virtual string PropertyName => string.Empty;
         
-        public abstract object GroupKeyFromItem(object item, int level, CultureInfo culture);
+        public abstract object GroupKeyFromItem(object item, int level);
         
         public virtual bool KeysMatch(object groupKey, object itemKey)
         {

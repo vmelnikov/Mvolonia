@@ -1,5 +1,6 @@
 using System.Collections;
 using System.ComponentModel;
+using Avalonia;
 
 namespace Mvolonia.Controls.Collections
 {
@@ -42,6 +43,46 @@ namespace Mvolonia.Controls.Collections
         /// Gets or sets the most recent index where activity took place
         /// </summary>
         internal int LastIndex { get; set; }
+        
+        /// <summary>
+        /// Gets the first item (leaf) added to this group.  If this can't be determined,
+        /// DependencyProperty.UnsetValue.
+        /// </summary>
+        internal object SeedItem
+        {
+            get
+            {
+                if (ItemCount > 0 && (GroupBy is null || GroupBy.GroupKeys.Count == 0))
+                {
+                    // look for first item, child by child
+                    for (int k = 0, n = Items.Count; k < n; ++k)
+                    {
+                        if (!(Items[k] is CollectionViewGroupInternal subgroup))
+                        {
+                            // child is an item - return it
+                            return Items[k];
+                        }
+                        else if (subgroup.ItemCount > 0)
+                        {
+                            // child is a nonempty subgroup - ask it
+                            return subgroup.SeedItem;
+                        }
+                        //// otherwise child is an empty subgroup - go to next child
+                    }
+
+                    // we shouldn't get here, but just in case...
+
+                    return AvaloniaProperty.UnsetValue;
+                }
+                else
+                {
+                    // the group is empty, or it has explicit subgroups.
+                    // In either case, we cannot determine the first item -
+                    // it could have gone into any of the subgroups.
+                    return AvaloniaProperty.UnsetValue;
+                }
+            }
+        }
 
         private void OnGroupByChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -123,6 +164,90 @@ namespace Mvolonia.Controls.Collections
             ProtectedItems.Add(item);
         }
         
+        /// <summary>
+        /// Insert a new item or subgroup and return its index.  Seed is a
+        /// representative from the subgroup (or the item itself) that
+        /// is used to position the new item/subgroup w.r.t. the order given
+        /// by the comparer. (If comparer is null, just add at the end).
+        /// </summary>
+        /// <param name="item">Item we are looking for</param>
+        /// <param name="seed">Seed of the item we are looking for</param>
+        /// <param name="comparer">Comparer used to find the item</param>
+        /// <returns>The index where the item was inserted</returns>
+        internal int Insert(object item, object seed, IComparer comparer)
+        {
+            // never insert the new item/group before the explicit subgroups
+            var low = GroupBy?.GroupKeys.Count ?? 0;
+            int index = FindIndex(item, seed, comparer, low, ProtectedItems.Count);
+
+            // now insert the item
+            ChangeCounts(item, +1);
+            ProtectedItems.Insert(index, item);
+
+            return index;
+        }
+        
+        /// <summary>
+        /// Clears the collection of items
+        /// </summary>
+        internal void Clear()
+        {
+            ProtectedItems.Clear();
+            FullCount = 1;
+            ProtectedItemCount = 0;
+        }
+        
+        /// <summary>
+        /// Finds the index of the specified item
+        /// </summary>
+        /// <param name="item">Item we are looking for</param>
+        /// <param name="seed">Seed of the item we are looking for</param>
+        /// <param name="comparer">Comparer used to find the item</param>
+        /// <param name="low">Low range of item index</param>
+        /// <param name="high">High range of item index</param>
+        /// <returns>Index of the specified item</returns>
+        protected virtual int FindIndex(object item, object seed, IComparer comparer, int low, int high)
+        {
+            int index;
+
+            if (comparer != null)
+            {
+                // if (comparer is ListComparer listComparer)
+                // {
+                //     // reset the IListComparer before each search. This cannot be done
+                //     // any less frequently (e.g. in Root.AddToSubgroups), due to the
+                //     // possibility that the item may appear in more than one subgroup.
+                //     listComparer.Reset();
+                // }
+                //
+                // if (comparer is CollectionViewGroupComparer groupComparer)
+                // {
+                //     // reset the CollectionViewGroupComparer before each search. This cannot be done
+                //     // any less frequently (e.g. in Root.AddToSubgroups), due to the
+                //     // possibility that the item may appear in more than one subgroup.
+                //     groupComparer.Reset();
+                // }
+
+                for (index = low; index < high; ++index)
+                {
+                    object seed1 = (ProtectedItems[index] is CollectionViewGroupInternal subgroup) ? subgroup.SeedItem : ProtectedItems[index];
+                    if (seed1 == AvaloniaProperty.UnsetValue)
+                    {
+                        continue;
+                    }
+                    if (comparer.Compare(seed, seed1) < 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                index = high;
+            }
+
+            return index;
+        }
         
         /// <summary>
         /// Returns the index of the given item within the list of leaves governed

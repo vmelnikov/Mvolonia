@@ -8,13 +8,13 @@ namespace Mvolonia.Controls.Collections
     /// </summary>
     internal abstract class CollectionViewGroup: INotifyPropertyChanged
     {
-        private readonly object _key;
-
         protected CollectionViewGroup(object key)
         {
-            _key = key;
+            Key = key;
             ProtectedItems = new AvaloniaList<object>();
         }
+        
+        public object Key { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         

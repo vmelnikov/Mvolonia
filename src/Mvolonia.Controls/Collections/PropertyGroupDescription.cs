@@ -22,7 +22,7 @@ namespace Mvolonia.Controls.Collections
              _propertyName = propertyName;
         }
 
-        public override object GroupKeyFromItem(object item, int level, CultureInfo culture)
+        public override object GroupKeyFromItem(object item, int level)
         {
             return GetKey(item) ?? item;
         }

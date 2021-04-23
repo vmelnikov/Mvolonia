@@ -21,6 +21,7 @@ namespace Mvolonia.Controls.Collections
             SourceCollection = source ?? throw new ArgumentNullException(nameof(source));
             
             _rootGroup = new CollectionViewGroupRoot(this);
+            _rootGroup.GroupDescriptions.CollectionChanged += OnGroupByChanged;
 
             CopySourceToInternalList();
 
@@ -50,12 +51,17 @@ namespace Mvolonia.Controls.Collections
         /// is needed for grouping
         /// </summary>
         private bool UsesLocalArray => GroupDescriptions.Count > 0;
-    
+
 
         private IEnumerable SourceCollection { get; }
 
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnGroupByChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            Refresh();
+        }
 
         private void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
@@ -104,10 +110,33 @@ namespace Mvolonia.Controls.Collections
 
         private void Refresh()
         {
-            // set IsGrouping to false
-             IsGrouping = false;
-             
-             CopySourceToInternalList();
+            CopySourceToInternalList();
+            PrepareGroups();
+        }
+
+        private void PrepareGroups()
+        {
+            _rootGroup.Clear();
+            _rootGroup.Initialize();
+
+
+            // set to false so that we access internal collection items
+            // instead of the group items, as they have been cleared
+            IsGrouping = false;
+
+            if (_rootGroup.GroupDescriptions.Count > 0)
+            {
+                for (int num = 0, count = _internalList.Count; num < count; ++num)
+                {
+                    var item = _internalList[num];
+                    if (item != null)
+                    {
+                        _rootGroup.AddToSubgroups(item, loading: true);
+                    }
+                }
+            }
+
+            IsGrouping = _rootGroup.GroupBy != null;
         }
 
 
