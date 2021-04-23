@@ -8,10 +8,6 @@ namespace Mvolonia.Controls.Collections
     
     internal class CollectionViewGroupRoot : CollectionViewGroupInternal
     {
-        /// <summary>
-        /// Private accessor for the top level GroupDescription
-        /// </summary>
-        private static GroupDescription _topLevelGroupDescription = new TopLevelGroupDescription();
         
         /// <summary>
         /// String constant used for the Root Name
@@ -19,7 +15,11 @@ namespace Mvolonia.Controls.Collections
         private const string RootName = "Root";
 
         private readonly ICollectionView _view;
-        private AvaloniaList<GroupDescription> _groupBy;
+        
+        /// <summary>
+        /// Private accessor for an ObservableCollection containing group descriptions
+        /// </summary>
+        private readonly AvaloniaList<GroupDescription> _groupBy = new AvaloniaList<GroupDescription>(); 
 
         public CollectionViewGroupRoot(ICollectionView view) : base(RootName, null)
         {

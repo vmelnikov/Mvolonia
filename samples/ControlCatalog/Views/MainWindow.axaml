@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:ControlCatalog.ViewModels"
+        xmlns:m="using:ControlCatalog.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -13,17 +14,15 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <mvo:GroupingListBox>
-        <ListBoxItem >
-            <StackPanel Orientation="Horizontal" Spacing="5">
-                <TextBlock VerticalAlignment="Center">Item 1</TextBlock>
-            </StackPanel>
-        </ListBoxItem>
-        <ListBoxItem>
-            <StackPanel Orientation="Horizontal" Spacing="5">
-                <TextBlock VerticalAlignment="Center">Item 2</TextBlock>
-            </StackPanel>
-        </ListBoxItem>
+    <mvo:GroupingListBox Name="ListBox">
+       <mvo:GroupingListBox.ItemTemplate>
+           <DataTemplate DataType="m:Employee">
+               <DockPanel>
+                   <TextBlock DockPanel.Dock="Top" Text="{Binding Name}"/>
+                   <TextBlock Text="{Binding Surname}"/>
+               </DockPanel>
+           </DataTemplate>
+       </mvo:GroupingListBox.ItemTemplate>
     </mvo:GroupingListBox>
     
 </Window>
