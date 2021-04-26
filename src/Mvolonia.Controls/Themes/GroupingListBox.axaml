@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:p="clr-namespace:Mvolonia.Controls.Presenters"
         xmlns:c="clr-namespace:Mvolonia.Controls;assembly=Mvolonia.Controls">
     <Design.PreviewWith>
         <Border Padding="20">
@@ -27,7 +28,7 @@
                                   Background="{TemplateBinding Background}"
                                   HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
                                   VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
-                        <ItemsPresenter Name="PART_ItemsPresenter"
+                        <p:GroupingItemsPresenter Name="PART_ItemsPresenter"
                                         Items="{TemplateBinding Items}"
                                         ItemsPanel="{TemplateBinding ItemsPanel}"
                                         ItemTemplate="{TemplateBinding ItemTemplate}"
@@ -44,8 +45,7 @@
             <ControlTemplate>
                 <StackPanel>
                     <ContentPresenter Name="PART_Header" />
-                    <ItemsPresenter 
-                        Items="{TemplateBinding Items}" />
+                    <p:GroupingItemsPresenter Items="{TemplateBinding Items}"/>
                 </StackPanel>
             </ControlTemplate>
         </Setter>

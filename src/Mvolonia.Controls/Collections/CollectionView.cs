@@ -36,7 +36,10 @@ namespace Mvolonia.Controls.Collections
         /// Gets the minimum number of items known to be in the source collection
         /// that verify the current filter if any
         /// </summary>
-        public int ItemCount => _internalList.Count;
+        public int ItemCount => 
+         IsGrouping 
+            ? _rootGroup.ItemCount
+            : _internalList.Count;
 
         public bool IsGrouping { get; private set; }
 
@@ -157,7 +160,7 @@ namespace Mvolonia.Controls.Collections
         public IEnumerator GetEnumerator()
         {
             return IsGrouping 
-                ? _rootGroup.GetLeafEnumerator() 
+                ? _rootGroup.Items.GetEnumerator() 
                 : _internalList.GetEnumerator();
         }
         

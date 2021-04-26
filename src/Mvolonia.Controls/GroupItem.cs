@@ -1,29 +1,133 @@
 using System.Collections;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Generators;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
+using Mvolonia.Controls.Collections;
+using Mvolonia.Controls.Generators;
 
 namespace Mvolonia.Controls
 {
-    public class GroupItem : TemplatedControl
+    
+    public class GroupItem : TemplatedControl, IItemsPresenterHost
     {
         private Control _header;
         
-        public static readonly DirectProperty<ItemsControl, IEnumerable> ItemsProperty =
-            AvaloniaProperty.RegisterDirect<ItemsControl, IEnumerable>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
+        
+        public static readonly DirectProperty<GroupItem, IEnumerable> ItemsProperty =
+            AvaloniaProperty.RegisterDirect<GroupItem, IEnumerable>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
 
         private IEnumerable _items;
+        private IItemContainerGenerator _itemContainerGenerator;
+        private CollectionViewGroup _viewGroup;
+
+        /// <summary>
+        /// Gets or sets the data template used to display the items in the control.
+        /// </summary>
+        public IDataTemplate ItemTemplate { get; private set; }
 
         public IEnumerable Items
         {
             get =>  _items;
             set => SetAndRaise(ItemsProperty, ref _items, value);
         }
+        
+        /// <summary>
+        /// Gets the items presenter control.
+        /// </summary>
+        public IItemsPresenter Presenter
+        {
+            get;
+            protected set;
+        }
+        
+        /// <summary>
+        /// Gets the <see cref="IItemContainerGenerator"/> for the control.
+        /// </summary>
+        public IItemContainerGenerator ItemContainerGenerator
+        {
+            get
+            {
+                if (_itemContainerGenerator != null) 
+                    return _itemContainerGenerator;
+                _itemContainerGenerator = CreateItemContainerGenerator();
+
+                if (_itemContainerGenerator is null) 
+                    return null;
+                
+                _itemContainerGenerator.ItemTemplate = ItemTemplate;
+                _itemContainerGenerator.Materialized += (_, e) => OnContainersMaterialized(e);
+                _itemContainerGenerator.Dematerialized += (_, e) => OnContainersDematerialized(e);
+                _itemContainerGenerator.Recycled += (_, e) => OnContainersRecycled(e);
+
+                return _itemContainerGenerator;
+            }
+        }
+
+        internal CollectionViewGroup ViewGroup
+        {
+            get => _viewGroup;
+            set
+            {
+                if (_viewGroup == value)
+                    return;
+                _viewGroup = value;
+                Items = ViewGroup.Items;
+                UpdateHeader();
+            }
+        }
+
+        private void OnContainersRecycled(ItemContainerEventArgs itemContainerEventArgs)
+        {
+        }
+
+        private void OnContainersDematerialized(ItemContainerEventArgs itemContainerEventArgs)
+        {
+        }
+
+        private void OnContainersMaterialized(ItemContainerEventArgs itemContainerEventArgs)
+        {
+        }
+
+        private IItemContainerGenerator CreateItemContainerGenerator()
+        {
+            return new GroupItemContainerGenerator(
+                this, 
+                ListBoxItem.ContentProperty,
+                ListBoxItem.ContentTemplateProperty);
+        }
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             _header =  e.NameScope.Find<Control>("PART_Header");
+            UpdateHeader();
             base.OnApplyTemplate(e);
+        }
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            if (Parent is ItemsControl itemsControl)
+                ItemTemplate = itemsControl.ItemTemplate;
+            base.OnAttachedToVisualTree(e);
+        }
+
+        private void UpdateHeader()
+        {
+            if (! (_header is ContentPresenter contentPresenter))
+                return;
+            if (ViewGroup is null)
+                return;
+            contentPresenter.Content = new TextBlock()
+            {
+                Text = ViewGroup.Key.ToString()
+            };
+        }
+
+        public void RegisterItemsPresenter(IItemsPresenter presenter)
+        {
+            Presenter = presenter;
         }
     }
 }
