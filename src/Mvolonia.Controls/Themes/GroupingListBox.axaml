@@ -33,7 +33,7 @@
                                         ItemsPanel="{TemplateBinding ItemsPanel}"
                                         ItemTemplate="{TemplateBinding ItemTemplate}"
                                         Margin="{TemplateBinding Padding}"
-                                        VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                                        VirtualizationMode="None" />
                     </ScrollViewer>
                 </Border>
             </ControlTemplate>
@@ -43,9 +43,9 @@
     <Style Selector="c|GroupItem">
         <Setter Property="Template">
             <ControlTemplate>
-                <StackPanel>
+                <StackPanel Name="PART_Panel">
                     <ContentPresenter Name="PART_Header" />
-                    <p:GroupingItemsPresenter Items="{TemplateBinding Items}"/>
+                  
                 </StackPanel>
             </ControlTemplate>
         </Setter>

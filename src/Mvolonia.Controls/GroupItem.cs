@@ -22,6 +22,7 @@ namespace Mvolonia.Controls
         private IEnumerable _items;
         private IItemContainerGenerator _itemContainerGenerator;
         private CollectionViewGroup _viewGroup;
+        private StackPanel _panel;
 
         /// <summary>
         /// Gets or sets the data template used to display the items in the control.
@@ -33,6 +34,8 @@ namespace Mvolonia.Controls
             get =>  _items;
             set => SetAndRaise(ItemsProperty, ref _items, value);
         }
+
+        public StackPanel Panel => _panel;
         
         /// <summary>
         /// Gets the items presenter control.
@@ -81,14 +84,33 @@ namespace Mvolonia.Controls
 
         private void OnContainersRecycled(ItemContainerEventArgs itemContainerEventArgs)
         {
+            var groupingListBox = GetParent<GroupingListBox>(); 
+            groupingListBox?.ChildContainersRecycled(itemContainerEventArgs);
         }
 
         private void OnContainersDematerialized(ItemContainerEventArgs itemContainerEventArgs)
         {
+            var groupingListBox = GetParent<GroupingListBox>(); 
+            groupingListBox?.ChildContainersDematerialized(itemContainerEventArgs);
         }
 
         private void OnContainersMaterialized(ItemContainerEventArgs itemContainerEventArgs)
         {
+            var groupingListBox = GetParent<GroupingListBox>(); 
+            groupingListBox?.ChildContainersMaterialized(itemContainerEventArgs);
+        }
+
+        private T GetParent<T>() where T: class
+        {
+            IControl control = this;
+            while (!(control.Parent is null))
+            {
+                control = control.Parent;
+                if (control is T t)
+                    return t;
+            }
+
+            return null;
         }
 
         private IItemContainerGenerator CreateItemContainerGenerator()
@@ -102,13 +124,15 @@ namespace Mvolonia.Controls
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             _header =  e.NameScope.Find<Control>("PART_Header");
+            _panel =  e.NameScope.Find<StackPanel>("PART_Panel");
             UpdateHeader();
             base.OnApplyTemplate(e);
         }
 
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
-            if (Parent is ItemsControl itemsControl)
+            var itemsControl = GetParent<ItemsControl>(); 
+            if (!(itemsControl is null))
                 ItemTemplate = itemsControl.ItemTemplate;
             base.OnAttachedToVisualTree(e);
         }
