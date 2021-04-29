@@ -37,11 +37,16 @@ namespace Mvolonia.Controls.Collections
         /// that verify the current filter if any
         /// </summary>
         public int ItemCount => 
-         IsGrouping 
-            ? _rootGroup.ItemCount
-            : _internalList.Count;
+             IsGrouping 
+                ? _rootGroup.ItemCount
+                : _internalList.Count;
 
         public bool IsGrouping { get; private set; }
+
+        public IEnumerable GroupingItems =>
+            IsGrouping
+                ? _rootGroup.Items
+                : _internalList as IEnumerable;
 
         /// <summary>
         /// Gets the description of grouping, indexed by level.
@@ -160,7 +165,7 @@ namespace Mvolonia.Controls.Collections
         public IEnumerator GetEnumerator()
         {
             return IsGrouping 
-                ? _rootGroup.Items.GetEnumerator() 
+                ? _rootGroup.GetLeafEnumerator() 
                 : _internalList.GetEnumerator();
         }
         
