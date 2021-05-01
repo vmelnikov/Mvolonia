@@ -15,7 +15,16 @@
     </Design.DataContext>
 
     <mvo:GroupingListBox Name="ListBox" SelectionMode="Multiple">
-       <mvo:GroupingListBox.ItemTemplate>
+        <mvo:GroupingListBox.GroupStyle>
+            <mvo:GroupStyle>
+                <mvo:GroupStyle.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="Group"/>
+                    </DataTemplate>
+                </mvo:GroupStyle.HeaderTemplate>
+            </mvo:GroupStyle>
+        </mvo:GroupingListBox.GroupStyle>
+        <mvo:GroupingListBox.ItemTemplate>
            <DataTemplate DataType="m:Employee">
                <DockPanel>
                    <TextBlock DockPanel.Dock="Top" Text="{Binding Name}"/>
