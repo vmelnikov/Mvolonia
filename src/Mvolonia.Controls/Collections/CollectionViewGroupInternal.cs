@@ -285,5 +285,46 @@ namespace Mvolonia.Controls.Collections
 
             return result;
         }
+        
+        /// <summary>
+        /// Returns the index of the given item within the list of leaves governed
+        /// by this group
+        /// </summary>
+        /// <param name="item">Item we are looking for</param>
+        /// <returns>Number of items under that leaf</returns>
+        internal int LeafIndexOf(object item)
+        {
+            var leaves = 0;         // number of leaves we've passed over so far
+            for (int k = 0, n = Items.Count; k < n; ++k)
+            {
+                if (Items[k] is CollectionViewGroupInternal subgroup)
+                {
+                    var subgroupIndex = subgroup.LeafIndexOf(item);
+                    if (subgroupIndex < 0)
+                    {
+                        leaves += subgroup.ItemCount;       // item not in this subgroup
+                    }
+                    else
+                    {
+                        return leaves + subgroupIndex;    // item is in this subgroup
+                    }
+                }
+                else
+                {
+                    // current item is a leaf - compare it directly
+                    
+                    
+                    if (Equals(item, Items[k]))
+                    {
+                        return leaves;
+                    }
+
+                    leaves += 1;
+                }
+            }
+
+            // item not found
+            return -1;
+        }
     }
 }

@@ -4,11 +4,17 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
 using Mvolonia.Controls.Generators;
 using Mvolonia.Controls.Utils;
 
 namespace Mvolonia.Controls
 {
+
+    public class GroupingDataTemplate : DataTemplate
+    {
+        
+    }
     public class GroupingListBox : ListBox
     {
         /// <summary>

@@ -13,8 +13,9 @@ namespace Mvolonia.Controls.Collections
             Key = key;
             ProtectedItems = new AvaloniaList<object>();
         }
-        
+
         public object Key { get; }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         

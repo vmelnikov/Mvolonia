@@ -63,12 +63,27 @@ namespace Mvolonia.Controls.Collections
 
         private IEnumerable SourceCollection { get; }
 
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnGroupByChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             Refresh();
+        }
+        
+        /// <summary>
+        ///     Notify listeners that this View has changed
+        /// </summary>
+        /// <param name="args">
+        ///     The NotifyCollectionChangedEventArgs to be passed to the EventHandler
+        /// </param>
+        private void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
+        {
+            if (CollectionChanged is null)
+                return;
+            CollectionChanged(this, args);
+            
         }
 
         private void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
@@ -106,14 +121,50 @@ namespace Mvolonia.Controls.Collections
             }
         }
 
-        private void ProcessAddEvent(object addedItem, int argsNewStartingIndex)
+        private void ProcessAddEvent(object addedItem, int addIndex)
         {
-            throw new NotImplementedException();
+            ProcessInsertToCollection(addedItem, addIndex);
+            _rootGroup.AddToSubgroups(addedItem, false);
+            
+            var addedIndex = _rootGroup?.LeafIndexOf(addedItem) ?? -1;
+            
+            // if the item is within the current page
+            if (addedIndex >= 0)
+            {
+                // fire add notification
+                OnCollectionChanged(
+                    new NotifyCollectionChangedEventArgs(
+                        NotifyCollectionChangedAction.Add,
+                        addedItem,
+                        addedIndex));
+            }
         }
 
         private void ProcessRemoveEvent(object removedItem, bool b)
         {
             throw new NotImplementedException();
+        }
+        
+        /// <summary>
+        /// Handles adding an item into the collection, and applying sorting, filtering, grouping, paging.
+        /// </summary>
+        /// <param name="item">Item to insert in the collection</param>
+        /// <param name="index">Index to insert item into</param>
+        private void ProcessInsertToCollection(object item, int index)
+        {
+          
+
+                // make sure that the specified insert index is within the valid range
+                // otherwise, just add it to the end. the index can be set to an invalid
+                // value if the item was originally not in the collection, on a different
+                // page, or if it had been previously filtered out.
+                if (index < 0 || index > _internalList.Count)
+                {
+                    index = _internalList.Count;
+                }
+
+                _internalList.Insert(index, item);
+            
         }
 
         private void Refresh()
@@ -181,5 +232,7 @@ namespace Mvolonia.Controls.Collections
             while (enumerator.MoveNext())
                 _internalList.Add(enumerator.Current);
         }
+
+        
     }
 }
