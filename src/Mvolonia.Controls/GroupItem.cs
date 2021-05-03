@@ -15,10 +15,6 @@ namespace Mvolonia.Controls
     {
         private Control _header;
         
-        
-        public static readonly DirectProperty<GroupItem, IEnumerable> ItemsProperty =
-            AvaloniaProperty.RegisterDirect<GroupItem, IEnumerable>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
-
         private IEnumerable _items;
         private IItemContainerGenerator _itemContainerGenerator;
         private CollectionViewGroup _viewGroup;
@@ -28,12 +24,7 @@ namespace Mvolonia.Controls
         /// Gets or sets the data template used to display the items in the control.
         /// </summary>
         public IDataTemplate ItemTemplate { get; private set; }
-
-        public IEnumerable Items
-        {
-            get =>  _items;
-            set => SetAndRaise(ItemsProperty, ref _items, value);
-        }
+        
 
         public StackPanel Panel => _panel;
         
@@ -77,7 +68,7 @@ namespace Mvolonia.Controls
                 if (_viewGroup == value)
                     return;
                 _viewGroup = value;
-                Items = ViewGroup.Items;
+                _items = ViewGroup.Items;
                 UpdateHeader();
             }
         }
@@ -143,10 +134,18 @@ namespace Mvolonia.Controls
                 return;
             if (ViewGroup is null)
                 return;
-            contentPresenter.Content = new TextBlock()
+            var groupingListBox = GetParent<GroupingListBox>();
+            if (groupingListBox is null)
             {
-                Text = ViewGroup.Key.ToString()
-            };
+                contentPresenter.Content = new TextBlock()
+                {
+                    Text = ViewGroup.Key.ToString()
+                };
+                return;
+            }
+
+            contentPresenter.Content = groupingListBox.GroupStyle[0].HeaderTemplate.Build(ViewGroup);
+            contentPresenter.DataContext = ViewGroup;
         }
 
         public void RegisterItemsPresenter(IItemsPresenter presenter)
