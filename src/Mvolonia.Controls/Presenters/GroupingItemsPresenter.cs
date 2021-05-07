@@ -10,7 +10,7 @@ using Avalonia.Input;
 
 namespace Mvolonia.Controls.Presenters
 {
-    public class GroupingItemsPresenter :ItemsPresenterBase, IItemContainerGeneratorHolder, ILogicalScrollable
+    public class GroupingItemsPresenter : ItemsPresenterBase, IItemContainerGeneratorHolder, ILogicalScrollable
     {
         private const double ScrollViewerDefaultSmallChange = 16;
         

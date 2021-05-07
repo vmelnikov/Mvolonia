@@ -261,7 +261,7 @@ namespace Mvolonia.Controls.Presenters
             //     collectionView.IsGrouping)
             // {
             //     Items = collectionView.GroupingItems;
-            //     ItemCount = collectionView.GroupingItems.Count();
+            //     Count = collectionView.GroupingItems.Count();
             //     return;
             // }
             Items = items;
