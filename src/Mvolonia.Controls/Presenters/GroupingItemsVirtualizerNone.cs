@@ -17,7 +17,7 @@ namespace Mvolonia.Controls.Presenters
         {
             if (Items != null && owner.Panel != null)
             {
-                AddContainers(0, Items);
+                ItemContainerSync.AddContainers(Owner, 0, Items);
             }
         }
 
@@ -72,61 +72,7 @@ namespace Mvolonia.Controls.Presenters
                 container?.BringIntoView();
             }
         }
-
-        private IList<ItemContainerInfo> AddContainers(int index, IEnumerable items)
-        {
-            var generator = ItemContainerGenerator;
-            var result = new List<ItemContainerInfo>();
-            var panel = Owner.Panel;
-
-            foreach (var item in items)
-            {
-                var materialized = generator.Materialize(index++, item);
-                
-                if (Items is ICollectionView collectionView)
-                {
-                    var group = collectionView.GroupingItems.Cast<CollectionViewGroup>()
-                        .FirstOrDefault(g => g.Items.Contains(item));
-                    if (!(group is null))
-                    {
-                        var groupItem = panel.Children.OfType<GroupItem>()
-                            .FirstOrDefault(c => Equals(c.ViewGroup, group));
-                                
-                        if (groupItem is null)
-                        {
-                            groupItem = new GroupItem
-                            {
-                                ViewGroup = group
-                            };
-                            panel.Children.Add(groupItem);
-                        }
-
-                        groupItem.Panel.Children.Add(materialized.ContainerControl);
-                    }
-                }
-                else
-                {
-                    panel.Children.Add(materialized.ContainerControl);
-                }
-
-                // if (i.ContainerControl != null)
-                // {
-                //     if (i.Index < panel.Children.Count)
-                //     {
-                //         // TODO: This will insert at the wrong place when there are null items.
-                //         panel.Children.Insert(i.Index, i.ContainerControl);
-                //     }
-                //     else
-                //     {
-                //         panel.Children.Add(i.ContainerControl);
-                //     }
-                // }
-
-                result.Add(materialized);
-            }
-
-            return result;
-        }
+        
 
         private void RemoveContainers(IEnumerable<ItemContainerInfo> items)
         {

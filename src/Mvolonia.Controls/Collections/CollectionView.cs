@@ -19,7 +19,7 @@ namespace Mvolonia.Controls.Collections
         public CollectionView(IEnumerable source)
         {
             SourceCollection = source ?? throw new ArgumentNullException(nameof(source));
-            
+
             _rootGroup = new CollectionViewGroupRoot(this);
             _rootGroup.GroupDescriptions.CollectionChanged += OnGroupByChanged;
 
@@ -31,15 +31,6 @@ namespace Mvolonia.Controls.Collections
                 coll.CollectionChanged += (_, args) => ProcessCollectionChanged(args);
             }
         }
-
-        /// <summary>
-        /// Gets the minimum number of items known to be in the source collection
-        /// that verify the current filter if any
-        /// </summary>
-        public int ItemCount => 
-             IsGrouping 
-                ? _rootGroup.ItemCount
-                : _internalList.Count;
 
         public bool IsGrouping { get; private set; }
 
@@ -54,13 +45,6 @@ namespace Mvolonia.Controls.Collections
         public AvaloniaList<GroupDescription> GroupDescriptions =>
             _rootGroup.GroupDescriptions;
 
-        /// <summary>
-        /// Gets a value indicating whether a private copy of the data 
-        /// is needed for grouping
-        /// </summary>
-        private bool UsesLocalArray => GroupDescriptions.Count > 0;
-
-
         private IEnumerable SourceCollection { get; }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
@@ -71,100 +55,104 @@ namespace Mvolonia.Controls.Collections
         {
             Refresh();
         }
-        
+
         /// <summary>
         ///     Notify listeners that this View has changed
         /// </summary>
         /// <param name="args">
         ///     The NotifyCollectionChangedEventArgs to be passed to the EventHandler
         /// </param>
-        private void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            if (CollectionChanged is null)
-                return;
-            CollectionChanged(this, args);
-            
-        }
+        private void OnCollectionChanged(NotifyCollectionChangedEventArgs args) =>
+            CollectionChanged?.Invoke(this, args);
+
 
         private void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            if (args.Action == NotifyCollectionChangedAction.Reset)
-            {
-                // if we have no items now, clear our own internal list
-                if (!SourceCollection.GetEnumerator().MoveNext())
-                    _internalList.Clear();
-                
-
-                // calling Refresh, will fire the CollectionChanged event
-                Refresh();
-                return;
-            }
-
             var addedItem = args.NewItems?[0];
             var removedItem = args.OldItems?[0];
-
-            // fire notifications for removes
-            if (args.Action == NotifyCollectionChangedAction.Remove ||
-                args.Action == NotifyCollectionChangedAction.Replace)
+            switch (args.Action)
             {
-                ProcessRemoveEvent(removedItem, args.Action == NotifyCollectionChangedAction.Replace);
+                case NotifyCollectionChangedAction.Add:
+                    ProcessAddEvent(addedItem, args.NewStartingIndex);
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    ProcessRemoveEvent(removedItem);
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    ProcessReplaceEvent(removedItem, addedItem);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    ProcessResetEvent();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+            
 
-            // fire notifications for adds
-            if (args.Action == NotifyCollectionChangedAction.Add)
-            {
-                ProcessAddEvent(addedItem, args.NewStartingIndex);
-            }
             if (args.Action != NotifyCollectionChangedAction.Replace)
-            {
-                OnPropertyChanged(nameof(ItemCount));
-            }
+                OnPropertyChanged(nameof(Count));
+            
         }
 
-        private void ProcessAddEvent(object addedItem, int addIndex)
-        {
-            ProcessInsertToCollection(addedItem, addIndex);
-            _rootGroup.AddToSubgroups(addedItem, false);
-            
-            var addedIndex = _rootGroup?.LeafIndexOf(addedItem) ?? -1;
-            
-            // if the item is within the current page
-            if (addedIndex >= 0)
-            {
-                // fire add notification
-                OnCollectionChanged(
-                    new NotifyCollectionChangedEventArgs(
-                        NotifyCollectionChangedAction.Add,
-                        addedItem,
-                        addedIndex));
-            }
-        }
-
-        private void ProcessRemoveEvent(object removedItem, bool b)
+        private void ProcessReplaceEvent(object oldValue, object newValue)
         {
             throw new NotImplementedException();
         }
-        
-        /// <summary>
-        /// Handles adding an item into the collection, and applying sorting, filtering, grouping, paging.
-        /// </summary>
-        /// <param name="item">Item to insert in the collection</param>
-        /// <param name="index">Index to insert item into</param>
-        private void ProcessInsertToCollection(object item, int index)
+
+        private void ProcessResetEvent() =>
+            Refresh();
+
+
+        private void ProcessAddEvent(object value, int index)
         {
-          
-
-                // make sure that the specified insert index is within the valid range
-                // otherwise, just add it to the end. the index can be set to an invalid
-                // value if the item was originally not in the collection, on a different
-                // page, or if it had been previously filtered out.
-                if (index < 0 || index > _internalList.Count)
-                {
-                    index = _internalList.Count;
-                }
-
-                _internalList.Insert(index, item);
+            var addedIndex = InsertToInternalList(value, index);
+            _rootGroup.AddToSubgroups(value, false);
             
+            if (addedIndex < 0)
+                return;
+
+            OnCollectionChanged(
+                new NotifyCollectionChangedEventArgs(
+                    NotifyCollectionChangedAction.Add,
+                    value,
+                    addedIndex));
+        }
+
+        private void ProcessRemoveEvent(object value)
+        {
+            var removedIndex = RemoveItemFromInternalList(value);
+            _rootGroup.RemoveFromSubgroups(value);
+            if (removedIndex < 0)
+                return;
+
+            OnCollectionChanged(
+                new NotifyCollectionChangedEventArgs(
+                    NotifyCollectionChangedAction.Remove,
+                    value,
+                    removedIndex));
+        }
+
+        private int InsertToInternalList(object item, int index)
+        {
+            // make sure that the specified insert index is within the valid range
+            // otherwise, just add it to the end. the index can be set to an invalid
+            // value if the item was originally not in the collection, on a different
+            // page, or if it had been previously filtered out.
+            if (index < 0 || index > _internalList.Count)
+                index = _internalList.Count;
+
+            _internalList.Insert(index, item);
+            return index;
+        }
+
+        private int RemoveItemFromInternalList(object value)
+        {
+            var index = _internalList.IndexOf(value);
+            if (index >= 0)
+                _internalList.Remove(value);
+            return index;
         }
 
         private void Refresh()
@@ -203,23 +191,18 @@ namespace Mvolonia.Controls.Collections
         /// Helper to raise a PropertyChanged event.
         /// </summary>
         /// <param name="propertyName">Property name for the property that changed</param>
-        private void OnPropertyChanged(string propertyName)
-        {
+        private void OnPropertyChanged(string propertyName) =>
             OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
-        
-        private void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            PropertyChanged?.Invoke(this, e);
-        }
 
-        public IEnumerator GetEnumerator()
-        {
-            return IsGrouping 
-                ? _rootGroup.GetLeafEnumerator() 
-                : _internalList.GetEnumerator();
-        }
-        
+
+        private void OnPropertyChanged(PropertyChangedEventArgs e) =>
+            PropertyChanged?.Invoke(this, e);
+
+
+        public IEnumerator GetEnumerator() =>
+            _internalList.GetEnumerator();
+
+
         /// <summary>
         /// Copy all items from the source collection to the internal list for processing.
         /// </summary>
@@ -233,6 +216,46 @@ namespace Mvolonia.Controls.Collections
                 _internalList.Add(enumerator.Current);
         }
 
-        
+        public int Count =>
+            _internalList.Count;
+
+        public void CopyTo(Array array, int index) =>
+            _internalList.CopyTo(array, index);
+
+        public bool IsSynchronized =>
+            _internalList.IsSynchronized;
+
+        public object SyncRoot =>
+            _internalList.SyncRoot;
+
+        public int Add(object value) =>
+            throw new NotSupportedException();
+
+        public void Clear() =>
+            throw new NotSupportedException();
+
+        public bool Contains(object value) =>
+            _internalList.Contains(value);
+
+        public int IndexOf(object value) =>
+            _internalList.IndexOf(value);
+
+        public void Insert(int index, object value) =>
+            throw new NotSupportedException();
+
+        public void Remove(object value) =>
+            throw new NotSupportedException();
+
+        public void RemoveAt(int index) =>
+            throw new NotSupportedException();
+
+        public bool IsFixedSize => true;
+        public bool IsReadOnly => true;
+
+        public object this[int index]
+        {
+            get => _internalList[index];
+            set => throw new NotSupportedException();
+        }
     }
 }

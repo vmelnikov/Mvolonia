@@ -151,6 +151,105 @@ namespace Mvolonia.Controls.Collections
         }
         
         /// <summary>
+        /// Remove specified item from subgroups
+        /// </summary>
+        /// <param name="item">Item to remove</param>
+        /// <returns>Whether the operation was successful</returns>
+        internal bool RemoveFromSubgroups(object item)
+        {
+            return RemoveFromSubgroups(item, this, 0);
+        }
+        
+        /// <summary>
+        /// Remove an item from the desired subgroup(s) of the given group.
+        /// </summary>
+        /// <param name="item">Item to remove</param>
+        /// <param name="group">Group to remove item from</param>
+        /// <param name="level">The level of grouping</param>
+        /// <returns>Return true if the item was not in one of the subgroups it was supposed to be.</returns>
+        private bool RemoveFromSubgroups(object item, CollectionViewGroupInternal group, int level)
+        {
+            var itemIsMissing = false;
+            var key = GetGroupKey(item, group.GroupBy, level);
+
+            if (key == UseAsItemDirectly)
+            {
+                // the item belongs to the group itself (not to any subgroups)
+                itemIsMissing = RemoveFromGroupDirectly(group, item);
+            }
+            else if (key is ICollection keyList)
+            {
+                // the item belongs to multiple subgroups
+                foreach (var o in keyList)
+                {
+                    if (RemoveFromSubgroup(item, group, level, o))
+                    {
+                        itemIsMissing = true;
+                    }
+                }
+            }
+            else
+            {
+                // the item belongs to one subgroup
+                if (RemoveFromSubgroup(item, group, level, key))
+                {
+                    itemIsMissing = true;
+                }
+            }
+
+            return itemIsMissing;
+        }
+        
+        /// <summary>
+        /// Remove an item from the subgroup with the given name.
+        /// </summary>
+        /// <param name="item">Item to remove</param>
+        /// <param name="group">Group to remove item from</param>
+        /// <param name="level">The level of grouping</param>
+        /// <param name="key">Name of item to remove</param>
+        /// <returns>Return true if the item was not in one of the subgroups it was supposed to be.</returns>
+        private bool RemoveFromSubgroup(object item, CollectionViewGroupInternal group, int level, object key)
+        {
+            var itemIsMissing = false;
+
+            // find the desired subgroup
+            for (int index = 0, n = group.Items.Count; index < n; ++index)
+            {
+              
+                if (!(group.Items[index] is CollectionViewGroupInternal subgroup))
+                    continue;           // skip children that are not groups
+                
+                if (!group.GroupBy.KeysMatch(subgroup.Key, key))
+                    continue;
+                
+                if (RemoveFromSubgroups(item, subgroup, level + 1))
+                    itemIsMissing = true;
+
+                return itemIsMissing;
+            }
+
+            // the item didn't match any subgroups.  It should have.
+            return true;
+        }
+        
+        /// <summary>
+        /// Remove an item from the direct children of a group.
+        /// </summary>
+        /// <param name="group">Group to remove item from</param>
+        /// <param name="item">Item to remove</param>
+        /// <returns>True if item could not be removed</returns>
+        private bool RemoveFromGroupDirectly(CollectionViewGroupInternal group, object item)
+        {
+            var leafIndex = group.Remove(item, true);
+            if (leafIndex < 0) 
+                return true;
+            
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, leafIndex));
+            return false;
+        }
+        
+        
+        /// <summary>
         /// Get the group name(s) for the given item
         /// </summary>
         /// <param name="item">Item to get group name for</param>

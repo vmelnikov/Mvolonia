@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Presenters;
-using Avalonia.Controls.Utils;
+using Mvolonia.Controls.Collections;
 using Mvolonia.Controls.Utils;
 
 namespace Mvolonia.Controls.Presenters
@@ -80,7 +80,7 @@ namespace Mvolonia.Controls.Presenters
             }
         }
 
-        private static IList<ItemContainerInfo> AddContainers(
+        public static IList<ItemContainerInfo> AddContainers(
             IItemsPresenter owner,
             int index,
             IEnumerable items)
@@ -91,22 +91,36 @@ namespace Mvolonia.Controls.Presenters
 
             foreach (var item in items)
             {
-                var i = generator.Materialize(index++, item);
+                var materialized = generator.Materialize(index++, item);
 
-                if (i.ContainerControl != null)
+                if (owner.Items is ICollectionView collectionView)
                 {
-                    if (i.Index < panel.Children.Count)
+                    var group = collectionView.GroupingItems.Cast<CollectionViewGroup>()
+                        .FirstOrDefault(g => g.Items.Contains(item));
+                    if (!(group is null))
                     {
-                        // TODO: This will insert at the wrong place when there are null items.
-                        panel.Children.Insert(i.Index, i.ContainerControl);
-                    }
-                    else
-                    {
-                        panel.Children.Add(i.ContainerControl);
+                        var groupItem = panel.Children.OfType<GroupItem>()
+                            .FirstOrDefault(c => Equals(c.ViewGroup, group));
+
+                        if (groupItem is null)
+                        {
+                            groupItem = new GroupItem
+                            {
+                                ViewGroup = group
+                            };
+                            panel.Children.Add(groupItem);
+                        }
+
+                        groupItem.Panel.Children.Add(materialized.ContainerControl);
                     }
                 }
+                else
+                {
+                    panel.Children.Add(materialized.ContainerControl);
+                }
 
-                result.Add(i);
+
+                result.Add(materialized);
             }
 
             return result;
