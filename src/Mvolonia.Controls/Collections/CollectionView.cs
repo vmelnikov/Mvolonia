@@ -9,9 +9,6 @@ namespace Mvolonia.Controls.Collections
 {
     public class CollectionView : ICollectionView, INotifyPropertyChanged
     {
-        /// <summary>
-        /// Private accessor for the InternalList
-        /// </summary>
         private IList _internalList;
 
         private readonly CollectionViewGroupRoot _rootGroup;
@@ -33,11 +30,26 @@ namespace Mvolonia.Controls.Collections
         }
 
         public bool IsGrouping { get; private set; }
+        
 
-        public IEnumerable GroupingItems =>
-            IsGrouping
-                ? _rootGroup.Items
-                : _internalList as IEnumerable;
+        CollectionViewGroup ICollectionView.FindGroupContainingItem(object item) =>
+            FindGroupContainingItem(_rootGroup, item);
+
+        private static CollectionViewGroup FindGroupContainingItem(CollectionViewGroup group, object item)
+        {
+            foreach (var groupItem in group.Items)
+            {
+                if (Equals(groupItem, item))
+                    return group;
+                if (!(groupItem is CollectionViewGroup collectionViewGroup))
+                    continue;
+                var subgroup = FindGroupContainingItem(collectionViewGroup, item);
+                if (subgroup is null)
+                    continue;
+                return subgroup;
+            }
+            return null;
+        }
 
         /// <summary>
         /// Gets the description of grouping, indexed by level.
@@ -90,10 +102,8 @@ namespace Mvolonia.Controls.Collections
                     throw new ArgumentOutOfRangeException();
             }
             
-
             if (args.Action != NotifyCollectionChangedAction.Replace)
                 OnPropertyChanged(nameof(Count));
-            
         }
 
         private void ProcessReplaceEvent(object oldValue, object newValue)

@@ -13,7 +13,7 @@ namespace Mvolonia.Controls.Collections
         private const string RootName = "Root";
 
         private readonly ICollectionView _view;
-        
+
         /// <summary>
         /// Private accessor for empty object instance
         /// </summary>
@@ -28,7 +28,7 @@ namespace Mvolonia.Controls.Collections
         {
             _view = view;
         }
-        
+
         /// <summary>
         /// Raise this event when the (grouped) view changes
         /// </summary>
@@ -38,7 +38,7 @@ namespace Mvolonia.Controls.Collections
         /// Gets the description of grouping, indexed by level.
         /// </summary>
         public AvaloniaList<GroupDescription> GroupDescriptions => _groupBy;
-        
+
         /// <summary>
         /// Gets or sets the current IComparer being used
         /// </summary>
@@ -59,6 +59,45 @@ namespace Mvolonia.Controls.Collections
         internal void AddToSubgroups(object item, bool loading)
         {
             AddToSubgroups(item, this, 0, loading);
+        }
+
+        /// <summary>
+        /// Add an item to the desired subgroup(s) of the given group
+        /// </summary>
+        /// <param name="item">Item to add</param>
+        /// <param name="group">Group to add item to</param>
+        /// <param name="level">The level of grouping</param>
+        /// <param name="loading">Whether we are currently loading</param>
+        private void AddToSubgroups(object item, CollectionViewGroupInternal group, int level, bool loading)
+        {
+            var key = GetGroupKey(item, group.GroupBy, level);
+
+            if (key == UseAsItemDirectly)
+            {
+                // the item belongs to the group itself (not to any subgroups)
+                if (loading)
+                {
+                    group.Add(item);
+                }
+                else
+                {
+                    var localIndex = group.Insert(item, item, ActiveComparer);
+                    var index = group.LeafIndexFromItem(item, localIndex);
+                    OnCollectionChanged(
+                        new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+                }
+            }
+            else if (key is ICollection keyList)
+            {
+                // the item belongs to multiple subgroups
+                foreach (var o in keyList)
+                    AddToSubgroup(item, group, level, o, loading);
+            }
+            else
+            {
+                // the item belongs to one subgroup
+                AddToSubgroup(item, group, level, key, loading);
+            }
         }
 
         /// <summary>
@@ -112,45 +151,6 @@ namespace Mvolonia.Controls.Collections
         }
 
         /// <summary>
-        /// Add an item to the desired subgroup(s) of the given group
-        /// </summary>
-        /// <param name="item">Item to add</param>
-        /// <param name="group">Group to add item to</param>
-        /// <param name="level">The level of grouping</param>
-        /// <param name="loading">Whether we are currently loading</param>
-        private void AddToSubgroups(object item, CollectionViewGroupInternal group, int level, bool loading)
-        {
-            var key = GetGroupKey(item, group.GroupBy, level);
-
-            if (key == UseAsItemDirectly)
-            {
-                // the item belongs to the group itself (not to any subgroups)
-                if (loading)
-                {
-                    group.Add(item);
-                }
-                else
-                {
-                    var localIndex = group.Insert(item, item, ActiveComparer);
-                    var index = group.LeafIndexFromItem(item, localIndex);
-                    OnCollectionChanged(
-                        new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
-                }
-            }
-            else if (key is ICollection keyList)
-            {
-                // the item belongs to multiple subgroups
-                foreach (var o in keyList)
-                    AddToSubgroup(item, group, level, o, loading);
-            }
-            else
-            {
-                // the item belongs to one subgroup
-                AddToSubgroup(item, group, level, key, loading);
-            }
-        }
-        
-        /// <summary>
         /// Remove specified item from subgroups
         /// </summary>
         /// <param name="item">Item to remove</param>
@@ -159,7 +159,7 @@ namespace Mvolonia.Controls.Collections
         {
             return RemoveFromSubgroups(item, this, 0);
         }
-        
+
         /// <summary>
         /// Remove an item from the desired subgroup(s) of the given group.
         /// </summary>
@@ -199,7 +199,7 @@ namespace Mvolonia.Controls.Collections
 
             return itemIsMissing;
         }
-        
+
         /// <summary>
         /// Remove an item from the subgroup with the given name.
         /// </summary>
@@ -215,13 +215,12 @@ namespace Mvolonia.Controls.Collections
             // find the desired subgroup
             for (int index = 0, n = group.Items.Count; index < n; ++index)
             {
-              
                 if (!(group.Items[index] is CollectionViewGroupInternal subgroup))
-                    continue;           // skip children that are not groups
-                
+                    continue; // skip children that are not groups
+
                 if (!group.GroupBy.KeysMatch(subgroup.Key, key))
                     continue;
-                
+
                 if (RemoveFromSubgroups(item, subgroup, level + 1))
                     itemIsMissing = true;
 
@@ -231,7 +230,7 @@ namespace Mvolonia.Controls.Collections
             // the item didn't match any subgroups.  It should have.
             return true;
         }
-        
+
         /// <summary>
         /// Remove an item from the direct children of a group.
         /// </summary>
@@ -241,14 +240,15 @@ namespace Mvolonia.Controls.Collections
         private bool RemoveFromGroupDirectly(CollectionViewGroupInternal group, object item)
         {
             var leafIndex = group.Remove(item, true);
-            if (leafIndex < 0) 
+            if (leafIndex < 0)
                 return true;
-            
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, leafIndex));
+
+            OnCollectionChanged(
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, leafIndex));
             return false;
         }
-        
-        
+
+
         /// <summary>
         /// Get the group name(s) for the given item
         /// </summary>
@@ -256,16 +256,11 @@ namespace Mvolonia.Controls.Collections
         /// <param name="groupDescription">GroupDescription for the group</param>
         /// <param name="level">The level of grouping</param>
         /// <returns>Group names for the specified item</returns>
-        private object GetGroupKey(object item, GroupDescription groupDescription, int level)
+        private static object GetGroupKey(object item, GroupDescription groupDescription, int level)
         {
-            if (groupDescription != null)
-            {
-                return groupDescription.GroupKeyFromItem(item, level);
-            }
-            else
-            {
-                return UseAsItemDirectly;
-            }
+            return groupDescription is null
+                ? UseAsItemDirectly
+                : groupDescription.GroupKeyFromItem(item, level);
         }
 
         /// <summary>
@@ -321,7 +316,7 @@ namespace Mvolonia.Controls.Collections
 
             return result;
         }
-        
+
         /// <summary>
         /// Notify listeners that this View has changed
         /// </summary>
