@@ -1,9 +1,6 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
-using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml.Templates;
 using Mvolonia.Controls.Generators;
 using Mvolonia.Controls.Utils;

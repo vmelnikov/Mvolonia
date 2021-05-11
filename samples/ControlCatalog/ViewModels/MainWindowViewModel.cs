@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections;
 using System.Collections.ObjectModel;
-using System.Text;
 using ControlCatalog.Models;
-using Microsoft.CodeAnalysis.Operations;
 using Mvolonia.Controls.Collections;
 using ReactiveUI;
 
@@ -15,7 +10,7 @@ namespace ControlCatalog.ViewModels
     {
         
         private readonly ObservableCollection<Employee> _employees = new ObservableCollection<Employee>();
-        private CollectionView _groupedEmployees;
+        private CollectionView _groupedEmployees = null!;
 
         public MainWindowViewModel()
         {

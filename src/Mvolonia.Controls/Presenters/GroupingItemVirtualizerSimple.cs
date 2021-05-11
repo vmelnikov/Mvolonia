@@ -343,33 +343,7 @@ namespace Mvolonia.Controls.Presenters
 
                     if (step == 1)
                     {
-                        if (Items is ICollectionView collectionView)
-                        {
-                            var group = collectionView.GroupingItems.Cast<CollectionViewGroup>()
-                                .FirstOrDefault(g => g.Items.Contains(item));
-                            if (!(group is null))
-                            {
-                                var groupItem = panel.Children.OfType<GroupItem>()
-                                    .FirstOrDefault(c => Equals(c.ViewGroup, group));
-                                
-                                if (groupItem is null)
-                                {
-                                    groupItem = new GroupItem
-                                    {
-                                        ViewGroup = group
-                                    };
-                                    panel.Children.Add(groupItem);
-                                }
-
-                                groupItem.Panel.Children.Add(materialized.ContainerControl);
-                            }
-                        }
-                        else
-                        {
-                            panel.Children.Add(materialized.ContainerControl);
-                        }
-                        
-                        
+                        panel.Children.Add(materialized.ContainerControl);
                     }
                     else
                     {

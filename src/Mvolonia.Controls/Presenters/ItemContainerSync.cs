@@ -86,33 +86,58 @@ namespace Mvolonia.Controls.Presenters
             IEnumerable items)
         {
             var generator = owner.GetItemContainerGenerator();
-            var result = new List<ItemContainerInfo>();
             var panel = owner.Panel;
+
+            if (owner.Items is ICollectionView collectionView &&
+                collectionView.IsGrouping)
+                return AddContainersToGroups(generator, panel, collectionView, index, items);
+
+
+            var result = new List<ItemContainerInfo>();
 
             foreach (var item in items)
             {
                 var materialized = generator.Materialize(index++, item);
 
-                if (owner.Items is ICollectionView collectionView)
+                if (materialized.ContainerControl != null)
                 {
-                    var group = collectionView.GroupingItems.Cast<CollectionViewGroup>()
-                        .FirstOrDefault(g => g.Items.Contains(item));
-                    if (!(group is null))
+                    if (materialized.Index < panel.Children.Count)
+                        panel.Children.Insert(materialized.Index, materialized.ContainerControl);
+                    else
+                        panel.Children.Add(materialized.ContainerControl);
+                }
+
+                result.Add(materialized);
+            }
+
+            return result;
+        }
+
+        private static IList<ItemContainerInfo> AddContainersToGroups(IItemContainerGenerator generator, IPanel panel,
+            ICollectionView collectionView, int index, IEnumerable items)
+        {
+            var result = new List<ItemContainerInfo>();
+
+            foreach (var item in items)
+            {
+                var materialized = generator.Materialize(index++, item);
+
+                var group = collectionView.FindGroupContainingItem(item);
+                if (!(group is null))
+                {
+                    var groupItem = panel.Children.OfType<GroupItem>()
+                        .FirstOrDefault(c => Equals(c.ViewGroup, group));
+
+                    if (groupItem is null)
                     {
-                        var groupItem = panel.Children.OfType<GroupItem>()
-                            .FirstOrDefault(c => Equals(c.ViewGroup, group));
-
-                        if (groupItem is null)
+                        groupItem = new GroupItem
                         {
-                            groupItem = new GroupItem
-                            {
-                                ViewGroup = group
-                            };
-                            panel.Children.Add(groupItem);
-                        }
-
-                        groupItem.Panel.Children.Add(materialized.ContainerControl);
+                            ViewGroup = group
+                        };
+                        panel.Children.Add(groupItem);
                     }
+
+                    groupItem.Panel.Children.Add(materialized.ContainerControl);
                 }
                 else
                 {
@@ -125,6 +150,7 @@ namespace Mvolonia.Controls.Presenters
 
             return result;
         }
+
 
         private static void RemoveContainers(
             IPanel panel,
