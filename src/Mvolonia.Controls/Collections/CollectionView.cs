@@ -85,7 +85,7 @@ namespace Mvolonia.Controls.Collections
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    ProcessAddEvent(addedItem, args.NewStartingIndex);
+                    ProcessAddEvent(addedItem);
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
@@ -115,10 +115,10 @@ namespace Mvolonia.Controls.Collections
             Refresh();
 
 
-        private void ProcessAddEvent(object value, int index)
+        private void ProcessAddEvent(object value)
         {
-            var addedIndex = InsertToInternalList(value, index);
             _rootGroup.AddToSubgroups(value, false);
+            var addedIndex = InsertToInternalList(value);
             
             if (addedIndex < 0)
                 return;
@@ -144,12 +144,14 @@ namespace Mvolonia.Controls.Collections
                     removedIndex));
         }
 
-        private int InsertToInternalList(object item, int index)
+        private int InsertToInternalList(object item)
         {
+            var index = _rootGroup.LeafIndexOf(item);
             // make sure that the specified insert index is within the valid range
             // otherwise, just add it to the end. the index can be set to an invalid
             // value if the item was originally not in the collection, on a different
             // page, or if it had been previously filtered out.
+            
             if (index < 0 || index > _internalList.Count)
                 index = _internalList.Count;
 

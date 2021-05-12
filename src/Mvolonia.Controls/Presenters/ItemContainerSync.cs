@@ -119,7 +119,8 @@ namespace Mvolonia.Controls.Presenters
             var result = new List<ItemContainerInfo>();
 
             foreach (var item in items)
-            {
+            {   
+                
                 var materialized = generator.Materialize(index++, item);
 
                 var group = collectionView.FindGroupContainingItem(item);
