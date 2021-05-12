@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
 using Avalonia.Collections;
+using Bogus;
 using ControlCatalog.Models;
 using Mvolonia.Controls.Collections;
 using ReactiveUI;
@@ -43,10 +44,22 @@ namespace ControlCatalog.ViewModels
 
         public void OnDeleteSelectedCommand() =>
             DeleteSelected();
+        
+        public void OnAddToRandomGroupCommand() =>
+            AddToRandomGroup();
+
+        private void AddToRandomGroup()
+        {
+            var faker = new Faker<Employee>()
+                .CustomInstantiator(f => new Employee( f.Name.FirstName(), f.Name.LastName(), f.Company.CompanyName()));
+            _employees.Add(faker.Generate());
+        }
 
         public void AddNewPersonCommand(string organisation)
         {
-            _employees.Add(new Employee("Name", "Surname", organisation));
+            var faker = new Faker<Employee>()
+                .CustomInstantiator(f => new Employee( f.Name.FirstName(), f.Name.LastName(), organisation));
+            _employees.Add(faker.Generate());
         }
         
         private void FillDefaultEmployees()
