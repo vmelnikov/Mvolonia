@@ -32,7 +32,7 @@
 
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="5">
-            <Button>Add to Random Group</Button>
+            <Button Command="{Binding OnAddToRandomGroupCommand}">Add to Random Group</Button>
             <Button Command="{Binding OnDeleteSelectedCommand}" >Delete Selected</Button>
         </StackPanel>
         <mvo:GroupingListBox Items="{Binding GroupedEmployees}"
