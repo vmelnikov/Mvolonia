@@ -1,5 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.ObjectModel;
+using System.Linq;
+using Avalonia.Collections;
 using ControlCatalog.Models;
 using Mvolonia.Controls.Collections;
 using ReactiveUI;
@@ -9,7 +10,7 @@ namespace ControlCatalog.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         
-        private readonly ObservableCollection<Employee> _employees = new ObservableCollection<Employee>();
+        private readonly AvaloniaList<Employee> _employees = new AvaloniaList<Employee>();
         private CollectionView _groupedEmployees = null!;
 
         public MainWindowViewModel()
@@ -19,6 +20,7 @@ namespace ControlCatalog.ViewModels
 
         }
 
+        public AvaloniaList<Employee> SelectedItems { get; } = new AvaloniaList<Employee>();
 
         public CollectionView GroupedEmployees
         {
@@ -33,6 +35,14 @@ namespace ControlCatalog.ViewModels
             collectionView.GroupDescriptions.Add(new PropertyGroupDescription("Organisation"));
             return collectionView;
         }
+
+        private void DeleteSelected()
+        {
+            _employees.RemoveAll(SelectedItems.ToList());
+        }
+
+        public void OnDeleteSelectedCommand() =>
+            DeleteSelected();
 
         public void AddNewPersonCommand(string organisation)
         {

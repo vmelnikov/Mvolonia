@@ -11,7 +11,7 @@ using Mvolonia.Controls.Generators;
 namespace Mvolonia.Controls
 {
     
-    public class GroupItem : TemplatedControl, IItemsPresenterHost
+    public class GroupItem : TemplatedControl, IGroupItem, IItemsPresenterHost
     {
         private Control _header;
         
@@ -24,10 +24,13 @@ namespace Mvolonia.Controls
         /// Gets or sets the data template used to display the items in the control.
         /// </summary>
         public IDataTemplate ItemTemplate { get; private set; }
-        
 
-        public StackPanel Panel => _panel;
-        
+
+        /// <inheritdoc/>
+        public bool IsEmpty => Panel.Children.Count == 0;
+
+        public IPanel Panel => _panel;
+
         /// <summary>
         /// Gets the items presenter control.
         /// </summary>
@@ -36,7 +39,7 @@ namespace Mvolonia.Controls
             get;
             protected set;
         }
-        
+
         /// <summary>
         /// Gets the <see cref="IItemContainerGenerator"/> for the control.
         /// </summary>
