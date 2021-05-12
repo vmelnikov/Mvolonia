@@ -43,10 +43,10 @@
     <Style Selector="c|GroupItem">
         <Setter Property="Template">
             <ControlTemplate>
-                <StackPanel Name="PART_Panel">
-                    <ContentPresenter Name="PART_Header" />
-                  
-                </StackPanel>
+                <DockPanel>
+                    <ContentPresenter DockPanel.Dock="Top" Name="PART_Header" />
+                    <StackPanel Name="PART_Panel"/>
+                </DockPanel>
             </ControlTemplate>
         </Setter>
     </Style>

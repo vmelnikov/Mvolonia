@@ -30,7 +30,14 @@
         </converters:GroupButtonsConverter>
     </Window.Resources>
 
-    <mvo:GroupingListBox Items="{Binding GroupedEmployees}" SelectionMode="Multiple">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="5">
+            <Button>Add to Random Group</Button>
+            <Button Command="{Binding OnDeleteSelectedCommand}" >Delete Selected</Button>
+        </StackPanel>
+        <mvo:GroupingListBox Items="{Binding GroupedEmployees}"
+                             SelectedItems="{Binding SelectedItems}"
+                             SelectionMode="Multiple">
         <mvo:GroupingListBox.GroupStyle>
             <mvo:GroupStyle>
                 <mvo:GroupStyle.HeaderTemplate>
@@ -57,5 +64,5 @@
             </DataTemplate>
         </mvo:GroupingListBox.ItemTemplate>
     </mvo:GroupingListBox>
-
+    </DockPanel>
 </Window>

@@ -160,7 +160,28 @@ namespace Mvolonia.Controls.Presenters
             {
                 if (i.ContainerControl != null)
                 {
-                    panel.Children.Remove(i.ContainerControl);
+                    RemoveControl(panel, i.ContainerControl);
+                }
+            }
+        }
+
+        private static void RemoveControl(IPanel panel, IControl control)
+        {
+            for (var i = panel.Children.Count - 1; i >= 0; i--)
+            {
+                var child = panel.Children[i];
+                if (child == control)
+                {
+                    panel.Children.RemoveAt(i);
+                    continue;
+                }
+
+
+                if (child is IGroupItem groupItem)
+                {
+                    RemoveControl(groupItem.Panel, control);
+                    if (groupItem.IsEmpty)
+                        panel.Children.RemoveAt(i);
                 }
             }
         }
