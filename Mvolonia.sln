@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlCatalog", "samples\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvolonia.Controls", "src\Mvolonia.Controls\Mvolonia.Controls.csproj", "{044C97C5-9887-4762-BEAB-CC56B94C7F77}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C9D296E0-7ADD-442F-9CB8-0FEEFDF873E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvolonia.Controls.Tests", "Mvolonia.Controls.Tests\Mvolonia.Controls.Tests.csproj", "{D7CC12C4-F809-4900-AD2D-664096AF657E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,12 @@ Global
 		{044C97C5-9887-4762-BEAB-CC56B94C7F77}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{044C97C5-9887-4762-BEAB-CC56B94C7F77}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{044C97C5-9887-4762-BEAB-CC56B94C7F77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7CC12C4-F809-4900-AD2D-664096AF657E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7CC12C4-F809-4900-AD2D-664096AF657E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7CC12C4-F809-4900-AD2D-664096AF657E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7CC12C4-F809-4900-AD2D-664096AF657E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D7CC12C4-F809-4900-AD2D-664096AF657E} = {C9D296E0-7ADD-442F-9CB8-0FEEFDF873E0}
 	EndGlobalSection
 EndGlobal
