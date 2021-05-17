@@ -2,7 +2,7 @@ using Mvolonia.Controls.Collections;
 using Mvolonia.Controls.Tests.Models;
 using Xunit;
 
-namespace Mvolonia.Controls.Tests
+namespace Mvolonia.Controls.Tests.Collections
 {
     public class CollectionViewTests
     {
