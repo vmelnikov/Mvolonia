@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Specialized;
 using Avalonia;
 using Avalonia.Controls;
@@ -44,8 +43,8 @@ namespace Mvolonia.Controls.Presenters
         /// </summary>
         public ItemVirtualizationMode VirtualizationMode
         {
-            get { return GetValue(VirtualizationModeProperty); }
-            set { SetValue(VirtualizationModeProperty, value); }
+            get => GetValue(VirtualizationModeProperty);
+            set => SetValue(VirtualizationModeProperty, value);
         }
 
         /// <summary>
@@ -53,7 +52,7 @@ namespace Mvolonia.Controls.Presenters
         /// </summary>
         bool ILogicalScrollable.CanHorizontallyScroll
         {
-            get { return _canHorizontallyScroll; }
+            get => _canHorizontallyScroll;
             set
             {
                 _canHorizontallyScroll = value;
@@ -66,7 +65,7 @@ namespace Mvolonia.Controls.Presenters
         /// </summary>
         bool ILogicalScrollable.CanVerticallyScroll
         {
-            get { return _canVerticallyScroll; }
+            get => _canVerticallyScroll;
             set
             {
                 _canVerticallyScroll = value;
@@ -183,17 +182,10 @@ namespace Mvolonia.Controls.Presenters
         {
             var i = TemplatedParent as ItemsControl;
             var result = i?.ItemContainerGenerator;
-            
-            if (result == null)
+
+            if (result is null)
             {
-                var groupItem = TemplatedParent as GroupItem;
-                result = groupItem?.ItemContainerGenerator;
-            }
-            
-            if (result == null)
-            {
-                result = new ItemContainerGenerator(this);
-                result.ItemTemplate = ItemTemplate;
+                result = new ItemContainerGenerator(this) {ItemTemplate = ItemTemplate};
             }
 
             return result;
