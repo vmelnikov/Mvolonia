@@ -23,7 +23,7 @@
     <Import Project="..\..\build\Avalonia.props" />
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Mvolonia.Controls\Mvolonia.Controls.csproj" />
+      <ProjectReference Include="..\..\src\Mvolonia.Controls\Mvolonia.Controls.csproj" />
     </ItemGroup>
 
 </Project>

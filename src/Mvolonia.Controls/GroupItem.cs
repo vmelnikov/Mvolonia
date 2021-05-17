@@ -94,6 +94,11 @@ namespace Mvolonia.Controls
             groupingListBox?.ChildContainersMaterialized(itemContainerEventArgs);
         }
 
+        public new  void ApplyTemplate()
+        {
+            base.ApplyTemplate();
+        }
+
         private T GetParent<T>() where T: class
         {
             IControl control = this;
@@ -154,6 +159,11 @@ namespace Mvolonia.Controls
         public void RegisterItemsPresenter(IItemsPresenter presenter)
         {
             Presenter = presenter;
+        }
+
+        public void AddControl(IControl control)
+        {
+            Panel?.Children.Add(control);
         }
     }
 }

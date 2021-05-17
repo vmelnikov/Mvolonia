@@ -138,7 +138,7 @@ namespace Mvolonia.Controls.Presenters
                         panel.Children.Add(groupItem);
                     }
 
-                    groupItem.Panel.Children.Add(materialized.ContainerControl);
+                    groupItem.AddControl(materialized.ContainerControl);
                 }
                 else
                 {
