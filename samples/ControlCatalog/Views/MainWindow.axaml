@@ -58,8 +58,8 @@
         <mvo:GroupingListBox.ItemTemplate>
             <DataTemplate DataType="m:Employee">
                 <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="{Binding Name}" />
-                    <TextBlock Text="{Binding Surname}" />
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding FirstName}" />
+                    <TextBlock Text="{Binding SecondName}" />
                 </DockPanel>
             </DataTemplate>
         </mvo:GroupingListBox.ItemTemplate>

@@ -20,7 +20,7 @@ namespace Mvolonia.Controls.Collections
         internal IEnumerator GetLeafEnumerator() =>
             new LeafEnumerator(this);
 
-        private CollectionViewGroupInternal Parent { get; }
+        internal CollectionViewGroupInternal Parent { get; }
 
         internal int FullCount { get; set; }
         
