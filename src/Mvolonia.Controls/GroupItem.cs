@@ -28,10 +28,6 @@ namespace Mvolonia.Controls
             }
         }
         
-        public void AddControl(IControl control)
-        {
-            Panel?.Children.Add(control);
-        }
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {

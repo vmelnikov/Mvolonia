@@ -119,34 +119,73 @@ namespace Mvolonia.Controls.Presenters
             var result = new List<ItemContainerInfo>();
 
             foreach (var item in items)
-            {   
-                
+            {
                 var materialized = generator.Materialize(index++, item);
 
-                var group = collectionView.FindGroupContainingItem(item);
-                if (!(group is null))
-                {
-                    var groupItem = panel.Children.OfType<GroupItem>()
-                        .FirstOrDefault(c => Equals(c.ViewGroup, group));
-
-                    if (groupItem is null)
-                    {
-                        groupItem = new GroupItem
-                        {
-                            ViewGroup = group
-                        };
-                        panel.Children.Add(groupItem);
-                    }
-
-                    groupItem.AddControl(materialized.ContainerControl);
-                }
-                else
-                {
-                    panel.Children.Add(materialized.ContainerControl);
-                }
+                AddContainerToGroupItem(panel, collectionView.FindGroupContainingItem(item), materialized);
 
 
                 result.Add(materialized);
+            }
+
+            return result;
+        }
+
+        private static void AddContainerToGroupItem(IPanel panel, CollectionViewGroup group,
+            ItemContainerInfo container)
+        {
+            if (group is null)
+                return;
+            var containerPath = GetContainerPath(group, container);
+
+            AddContainerPathToPanel(containerPath, panel);
+            
+        }
+
+        private static void AddContainerPathToPanel(IList<object> containerPath, IPanel panel)
+        {
+            for (var i = 0; i < containerPath.Count; i++)
+            {
+                var pathItem = containerPath[i];
+                switch (pathItem)
+                {
+                    case CollectionViewGroup group:
+                    {
+                        var groupItem = GetOrAddGroupItem(@group, panel);
+                        panel = groupItem.Panel;
+                        break;
+                    }
+                    case ItemContainerInfo container:
+                        panel?.Children.Add(container.ContainerControl);
+                        break;
+                }
+            }
+
+        }
+
+        private static GroupItem GetOrAddGroupItem(CollectionViewGroup group, IPanel panel)
+        {
+            var groupItem = panel.Children.OfType<GroupItem>()
+                .FirstOrDefault(c => Equals(c.ViewGroup, group));
+
+            if (!(groupItem is null)) 
+                return groupItem;
+            groupItem = new GroupItem
+            {
+                ViewGroup = group
+            };
+            panel.Children.Add(groupItem);
+            groupItem.ApplyTemplate();
+            return groupItem;
+        }
+
+        private static IList<object> GetContainerPath(CollectionViewGroup group, ItemContainerInfo container)
+        {
+            var result = new List<object>() {container};
+            while (!(group is null || group is CollectionViewGroupRoot))
+            {
+                result.Insert(0, group);
+                group = (group as CollectionViewGroupInternal)?.Parent;
             }
 
             return result;
