@@ -11,7 +11,7 @@ namespace ControlCatalog.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private readonly AvaloniaList<Employee> _employees = new AvaloniaList<Employee>();
+        private readonly AvaloniaList<Employee> _employees = new();
         private CollectionView _groupedEmployees = null!;
 
         public MainWindowViewModel()
@@ -20,7 +20,7 @@ namespace ControlCatalog.ViewModels
             GroupedEmployees = CreateGroupedEmployees(_employees);
         }
 
-        public AvaloniaList<Employee> SelectedItems { get; } = new AvaloniaList<Employee>();
+        public AvaloniaList<Employee> SelectedItems { get; } = new();
 
         public CollectionView GroupedEmployees
         {
@@ -55,11 +55,17 @@ namespace ControlCatalog.ViewModels
             _employees.Add(faker.Generate());
         }
 
-        public void AddNewPersonCommand(string company)
+        public void AddNewMaleCommand(string company)
         {
             var faker = new Faker<Employee>()
-                .CustomInstantiator(f => new Employee(f.Name.FirstName(), f.Name.LastName(), company,
-                    f.Person.Gender == Name.Gender.Male ? "Male" : "Female"));
+                .CustomInstantiator(f => new Employee(f.Name.FirstName(), f.Name.LastName(), company, "Male"));
+            _employees.Add(faker.Generate());
+        }
+        
+        public void AddNewFemaleCommand(string company)
+        {
+            var faker = new Faker<Employee>()
+                .CustomInstantiator(f => new Employee(f.Name.FirstName(), f.Name.LastName(), company, "Female"));
             _employees.Add(faker.Generate());
         }
 
@@ -68,8 +74,8 @@ namespace ControlCatalog.ViewModels
             _employees.Add(new Employee("Ivan", "Ivanov", "Roga & Kopyta", "Male"));
             _employees.Add(new Employee("Petr", "Petrov", "Roga & Kopyta", "Male"));
             _employees.Add(new Employee("Raisa", "Ivanovna", "Roga & Kopyta", "Female"));
-            _employees.Add(new Employee("Petr", "Ivanov", "Only Roga", "Male"));
-            _employees.Add(new Employee("Elena", "Petrovna", "Only Kopyta", "Female"));
+            _employees.Add(new Employee("Petr", "Ivanov", "Only Male Company", "Male"));
+            _employees.Add(new Employee("Elena", "Petrovna", "Only Female Company", "Female"));
         }
     }
 }

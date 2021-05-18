@@ -1,14 +1,12 @@
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
-using Avalonia.Markup.Xaml.Templates;
 using Mvolonia.Controls.Generators;
-using Mvolonia.Controls.Utils;
 
 namespace Mvolonia.Controls
 {
     
-    public class GroupingListBox : ListBox
+    public class GroupingListBox : ListBox, IGroupingItemsGeneratorHost
     {
         /// <summary>
         /// The collection of GroupStyle objects that describes the display of
@@ -23,8 +21,8 @@ namespace Mvolonia.Controls
         {
             return new GroupItemContainerGenerator(
                 this, 
-                ListBoxItem.ContentProperty,
-                ListBoxItem.ContentTemplateProperty);
+                ContentControl.ContentProperty,
+                ContentControl.ContentTemplateProperty);
         }
 
         protected override void OnContainersMaterialized(ItemContainerEventArgs e)
@@ -34,6 +32,15 @@ namespace Mvolonia.Controls
                 if (!(container.ContainerControl is GroupItem))
                     base.OnContainersMaterialized(new ItemContainerEventArgs(container));
             }
+        }
+
+        public GroupStyle GetGroupStyle(int level)
+        {
+            // use last entry for all higher levels
+            if (level >= GroupStyle.Count)
+                level = GroupStyle.Count - 1;
+
+            return (level >= 0) ? GroupStyle[level] : null;
         }
     }
 }
