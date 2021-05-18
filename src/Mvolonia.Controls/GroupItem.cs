@@ -10,7 +10,8 @@ namespace Mvolonia.Controls
     {
         private Control _header;
         private CollectionViewGroup _viewGroup;
-        
+        private int _level;
+
         /// <inheritdoc/>
         public bool IsEmpty => Panel?.Children?.Count == 0;
 
@@ -24,10 +25,31 @@ namespace Mvolonia.Controls
                 if (_viewGroup == value)
                     return;
                 _viewGroup = value;
+                _level = GetViewGroupLevel(value as CollectionViewGroupInternal);
                 UpdateHeader();
             }
         }
-        
+
+        private static int GetViewGroupLevel(CollectionViewGroupInternal group)
+        {
+            var level = 0;
+            while (true)
+            {
+                group = group.Parent;
+                switch (@group)
+                {
+                    case null:
+                        return level;
+                    case CollectionViewGroupRoot _:
+                        return level;
+                    default:
+                        level++;
+                        break;
+                }
+            }
+            
+        }
+
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
@@ -44,18 +66,20 @@ namespace Mvolonia.Controls
                 return;
             if (ViewGroup is null)
                 return;
-            var groupingListBox = GetParent<GroupingListBox>();
-            if (groupingListBox is null)
-            {
-                contentPresenter.Content = new TextBlock()
+            var host = GetParent<IGroupingItemsGeneratorHost>();
+            var groupStyle = host?.GetGroupStyle(_level);
+            contentPresenter.Content = BuildHeaderContent(groupStyle);
+            contentPresenter.DataContext = ViewGroup;
+        }
+
+        private object BuildHeaderContent(GroupStyle groupStyle)
+        {
+            if (groupStyle is null)
+                return new TextBlock()
                 {
                     Text = ViewGroup.Key.ToString()
                 };
-                return;
-            }
-
-            contentPresenter.Content = groupingListBox.GroupStyle[0].HeaderTemplate.Build(ViewGroup);
-            contentPresenter.DataContext = ViewGroup;
+            return groupStyle.HeaderTemplate.Build(ViewGroup);
         }
 
 

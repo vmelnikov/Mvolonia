@@ -9,60 +9,104 @@
         x:Class="ControlCatalog.Views.MainWindow"
         xmlns:converters="clr-namespace:ControlCatalog.Converters"
         Icon="/Assets/avalonia-logo.ico"
-        Title="ControlCatalog">
+        Title="ControlCatalog"
+        Name="MainWindow">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
     <Window.Resources>
-        <converters:GroupButtonsConverter x:Key="GroupButtonsConverter">
-            <converters:GroupButtonsConverter.RogaAndKopytaHeader>
+        <converters:CompanyGroupItemHeaderTemplateConverter x:Key="GroupButtonsConverter">
+            <converters:CompanyGroupItemHeaderTemplateConverter.DefaultGroupHeaderTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Button Command="{Binding $parent[Window].DataContext.AddNewPersonCommand}"
-                                CommandParameter="{Binding Key}">
-                            Add New
-                        </Button>
-                    </StackPanel>
+                    <Border Padding="10" Background="LightGray">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="5">
+                                <Button Command="{Binding DataContext.AddNewMaleCommand, ElementName=MainWindow}"
+                                        CommandParameter="{Binding Key}">
+                                    Add Male
+                                </Button>
+                                <Button Command="{Binding DataContext.AddNewFemaleCommand, ElementName=MainWindow}"
+                                        CommandParameter="{Binding Key}">
+                                    Add Female
+                                </Button>
+                            </StackPanel>
+                            <TextBlock Text="{Binding Key}" />
+                        </DockPanel>
+                    </Border>
                 </DataTemplate>
-            </converters:GroupButtonsConverter.RogaAndKopytaHeader>
-        </converters:GroupButtonsConverter>
+            </converters:CompanyGroupItemHeaderTemplateConverter.DefaultGroupHeaderTemplate>
+            <converters:CompanyGroupItemHeaderTemplateConverter.OnlyMaleGroupHeaderTemplate>
+                <DataTemplate>
+                    <Border Padding="10" Background="LightGray">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="5">
+                                <Button Command="{Binding DataContext.AddNewMaleCommand, ElementName=MainWindow}"
+                                        CommandParameter="{Binding Key}">
+                                    Add Male
+                                </Button>
+                            </StackPanel>
+                            <TextBlock Text="{Binding Key}" />
+                        </DockPanel>
+                    </Border>
+                </DataTemplate>
+            </converters:CompanyGroupItemHeaderTemplateConverter.OnlyMaleGroupHeaderTemplate>
+            <converters:CompanyGroupItemHeaderTemplateConverter.OnlyFemaleGroupHeaderTemplate>
+                <DataTemplate>
+                    <Border Padding="10" Background="LightGray">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="5">
+                                <Button Command="{Binding DataContext.AddNewFemaleCommand, ElementName=MainWindow}"
+                                        CommandParameter="{Binding Key}">
+                                    Add Female
+                                </Button>
+                            </StackPanel>
+                            <TextBlock Text="{Binding Key}" />
+                        </DockPanel>
+                    </Border>
+                </DataTemplate>
+            </converters:CompanyGroupItemHeaderTemplateConverter.OnlyFemaleGroupHeaderTemplate>
+        </converters:CompanyGroupItemHeaderTemplateConverter>
     </Window.Resources>
 
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="5">
             <Button Command="{Binding OnAddToRandomGroupCommand}">Add to Random Group</Button>
-            <Button Command="{Binding OnDeleteSelectedCommand}" >Delete Selected</Button>
+            <Button Command="{Binding OnDeleteSelectedCommand}">Delete Selected</Button>
         </StackPanel>
         <mvo:GroupingListBox Items="{Binding GroupedEmployees}"
                              SelectedItems="{Binding SelectedItems}"
                              SelectionMode="Multiple">
-        <mvo:GroupingListBox.GroupStyle>
-            <mvo:GroupStyle>
-                <mvo:GroupStyle.HeaderTemplate>
-                    <DataTemplate>
-                        <Border Padding="10" Background="LightGray">
-                            <DockPanel>
-                                <ContentControl DockPanel.Dock="Right"
-                                                Content="{Binding Key, 
-                                                Converter={StaticResource GroupButtonsConverter}, 
-                                                ConverterParameter={Binding Key}}" />
-                                <TextBlock Text="{Binding Key}" />
-                            </DockPanel>
-                        </Border>
-                    </DataTemplate>
-                </mvo:GroupStyle.HeaderTemplate>
-            </mvo:GroupStyle>
-        </mvo:GroupingListBox.GroupStyle>
-        <mvo:GroupingListBox.ItemTemplate>
-            <DataTemplate DataType="m:Employee">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="{Binding FirstName}" />
-                    <TextBlock Text="{Binding SecondName}" />
-                </DockPanel>
-            </DataTemplate>
-        </mvo:GroupingListBox.ItemTemplate>
-    </mvo:GroupingListBox>
+            <mvo:GroupingListBox.GroupStyle>
+                <mvo:GroupStyle>
+                    <mvo:GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <ContentControl
+                                Content="{Binding Key,
+                                                Converter={StaticResource GroupButtonsConverter}}" />
+                        </DataTemplate>
+                    </mvo:GroupStyle.HeaderTemplate>
+                </mvo:GroupStyle>
+                <mvo:GroupStyle>
+                    <mvo:GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="5" Spacing="5">
+                        <TextBlock Text="{Binding Key}" FontWeight="600" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ItemCount}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                        </DataTemplate>
+                    </mvo:GroupStyle.HeaderTemplate>
+                </mvo:GroupStyle>
+            </mvo:GroupingListBox.GroupStyle>
+            <mvo:GroupingListBox.ItemTemplate>
+                <DataTemplate DataType="m:Employee">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="{Binding FirstName}" />
+                        <TextBlock Text="{Binding SecondName}" />
+                    </DockPanel>
+                </DataTemplate>
+            </mvo:GroupingListBox.ItemTemplate>
+        </mvo:GroupingListBox>
     </DockPanel>
 </Window>

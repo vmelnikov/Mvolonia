@@ -26,6 +26,8 @@ namespace Mvolonia.Controls.Collections
         {
             return GetKey(item) ?? item;
         }
+        
+        public override string PropertyName => _propertyName;
 
         private object GetKey(object o)
         {
@@ -42,6 +44,7 @@ namespace Mvolonia.Controls.Collections
         {
             return o.GetType().GetNestedPropertyType(_propertyName);
         }
+        
         private static object InvokePath(object item, string propertyPath, Type propertyType)
         {
             var propertyValue = TypeHelper.GetNestedPropertyValue(item, propertyPath, propertyType, out var exception);
