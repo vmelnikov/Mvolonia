@@ -28,7 +28,7 @@ namespace Mvolonia.Controls.Collections
             set
             {
                 if (IsSealed)
-                    throw new InvalidOperationException("Can't change after sealed ");
+                    throw new InvalidOperationException("Can't change after seal");
 
                 if (value < ListSortDirection.Ascending || value > ListSortDirection.Descending)
                     throw new InvalidEnumArgumentException(nameof(value), (int) value, typeof(ListSortDirection));
