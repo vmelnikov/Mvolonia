@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using Avalonia.Collections;
 
 namespace Mvolonia.Controls.Collections
@@ -12,6 +13,7 @@ namespace Mvolonia.Controls.Collections
         private IList _internalList;
 
         private readonly CollectionViewGroupRoot _rootGroup;
+        private SortDescriptionCollection _sortDescriptions;
 
         public CollectionView(IEnumerable source)
         {
@@ -56,12 +58,55 @@ namespace Mvolonia.Controls.Collections
         /// </summary>
         public AvaloniaList<GroupDescription> GroupDescriptions =>
             _rootGroup.GroupDescriptions;
+        
+        /// <summary>
+        /// Collection of Sort criteria to sort items in this view over the SourceCollection.
+        /// </summary>
+        /// <remarks>
+        /// <p>
+        /// One or more sort criteria in form of <seealso cref="SortDescription"/>
+        /// can be added, each specifying a property and direction to sort by.
+        /// </p>
+        /// </remarks>
+        public SortDescriptionCollection SortDescriptions
+        {
+            get
+            {
+                if (_sortDescriptions is null)
+                    SetSortDescriptions(new SortDescriptionCollection());
+                return _sortDescriptions;
+            }
+        }
 
         private IEnumerable SourceCollection { get; }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
+        
+        
+        /// <summary>
+        /// Set new SortDescription collection; re-hook collection change notification handler
+        /// </summary>
+        /// <param name="descriptions">SortDescriptionCollection to set the property value to</param>
+        private void SetSortDescriptions(SortDescriptionCollection descriptions)
+        {
+            if (_sortDescriptions != null)
+                _sortDescriptions.CollectionChanged -= SortDescriptionsChanged;
+            
+
+            _sortDescriptions = descriptions;
+
+            if (_sortDescriptions is null) 
+                return;
+            Debug.Assert(_sortDescriptions.Count == 0, "must be empty SortDescription collection");
+            _sortDescriptions.CollectionChanged += SortDescriptionsChanged;
+        }
+
+        private void SortDescriptionsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            
+        }
 
         private void OnGroupByChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
