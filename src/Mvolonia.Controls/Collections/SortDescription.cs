@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 
 namespace Mvolonia.Controls.Collections
 {
@@ -54,5 +55,12 @@ namespace Mvolonia.Controls.Collections
 
         internal void Seal() =>
             IsSealed = true;
+
+        public IEnumerable<object> OrderBy(IEnumerable<object> seq) =>
+            seq.OrderBy(o => o, Comparer);
+        
+        public IEnumerable<object> ThenBy(IOrderedEnumerable<object> seq) =>
+            seq.ThenBy(o => o, Comparer);
+        
     }
 }
