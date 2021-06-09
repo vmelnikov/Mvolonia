@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using Avalonia.Collections;
 using Mvolonia.Controls.Collections.Comparers;
 
@@ -46,6 +47,16 @@ namespace Mvolonia.Controls.Collections
                 return _itemType;
             }
         }
+        
+        /// <summary>
+        /// Gets a value indicating whether a private copy of the data 
+        /// is needed for sorting. We want any deriving 
+        /// classes to also be able to access this value to see whether or not 
+        /// to use the default source collection, or the internal list.
+        /// </summary>
+        private bool UsesLocalArray =>
+             SortDescriptions.Count > 0 || GroupDescriptions.Count > 0;
+        
 
 
         CollectionViewGroup ICollectionView.FindGroupContainingItem(object item) =>
@@ -120,6 +131,8 @@ namespace Mvolonia.Controls.Collections
 
         private void SortDescriptionsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            Refresh();
+            OnPropertyChanged(nameof(SortDescriptions));
         }
 
         private void OnGroupByChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -254,20 +267,6 @@ namespace Mvolonia.Controls.Collections
         }
 
 
-        private int InsertToInternalList(object item)
-        {
-            var index = _rootGroup.LeafIndexOf(item);
-            // make sure that the specified insert index is within the valid range
-            // otherwise, just add it to the end. the index can be set to an invalid
-            // addedItem if the item was originally not in the collection, on a different
-            // page, or if it had been previously filtered out.
-
-            if (index < 0 || index > _internalList.Count)
-                index = _internalList.Count;
-
-            _internalList.Insert(index, item);
-            return index;
-        }
 
         private int RemoveItemFromInternalList(object value)
         {
@@ -279,9 +278,38 @@ namespace Mvolonia.Controls.Collections
 
         private void Refresh()
         {
+            IsGrouping = false;
             CopySourceToInternalList();
+            if (!UsesLocalArray) 
+                return;
+            SortInternalList();
             PrepareGroups();
         }
+        
+        /// <summary>
+        /// Sort the List based on the SortDescriptions property.
+        /// </summary>
+        /// <param name="list">List of objects to sort</param>
+        /// <returns>The sorted list</returns>
+        private void SortInternalList()
+        {
+
+            var seq = (IEnumerable<object>)_internalList;
+            var itemType = ItemType;
+
+            foreach (var sort in SortDescriptions)
+            {
+               // sort.Initialize(itemType); 
+
+                if(seq is IOrderedEnumerable<object> orderedEnum)
+                    seq =  sort.ThenBy(orderedEnum);
+                else
+                    seq =  sort.OrderBy(seq);
+            }
+
+            _internalList = seq.ToList();
+        }
+        
 
         /// <summary>
         /// Sets up the ActiveComparer for the CollectionViewGroupRoot specified
