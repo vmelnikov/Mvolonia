@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Presenters;
@@ -144,23 +146,39 @@ namespace Mvolonia.Controls.Presenters
 
         private static void AddContainerPathToPanel(IList<object> containerPath, IPanel panel)
         {
+            CollectionViewGroup group = null;
             for (var i = 0; i < containerPath.Count; i++)
             {
                 var pathItem = containerPath[i];
                 switch (pathItem)
                 {
-                    case CollectionViewGroup group:
+                    case CollectionViewGroup pathGroup:
                     {
-                        var groupItem = GetOrAddGroupItem(@group, panel);
+                        var groupItem = GetOrAddGroupItem(pathGroup, panel);
                         panel = groupItem.Panel;
+                        group = pathGroup;
                         break;
                     }
                     case ItemContainerInfo container:
-                        panel?.Children.Add(container.ContainerControl);
+                        AddContainerToPanel(panel, group, container);
+                        
                         break;
                 }
             }
 
+        }
+
+        private static void AddContainerToPanel(IPanel panel, CollectionViewGroup group, ItemContainerInfo container)
+        {
+            if (panel is null)
+                throw new ArgumentNullException();
+            if (group is null)
+                throw new ArgumentNullException();
+
+            var index = group.Items.IndexOf(container.Item);
+            if (index < 0 || index > panel.Children.Count)
+                index = panel.Children.Count;
+            panel.Children.Insert(index, container.ContainerControl); 
         }
 
         private static GroupItem GetOrAddGroupItem(CollectionViewGroup group, IPanel panel)
