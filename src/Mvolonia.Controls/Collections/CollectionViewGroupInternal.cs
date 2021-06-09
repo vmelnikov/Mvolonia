@@ -1,6 +1,7 @@
 using System.Collections;
 using System.ComponentModel;
 using Avalonia;
+using Mvolonia.Controls.Collections.Comparers;
 
 namespace Mvolonia.Controls.Collections
 {
@@ -212,14 +213,14 @@ namespace Mvolonia.Controls.Collections
 
             if (comparer != null)
             {
-                // if (comparer is ListComparer listComparer)
-                // {
-                //     // reset the IListComparer before each search. This cannot be done
-                //     // any less frequently (e.g. in Root.AddToSubgroups), due to the
-                //     // possibility that the item may appear in more than one subgroup.
-                //     listComparer.Reset();
-                // }
-                //
+                if (comparer is ListComparer listComparer)
+                {
+                    // reset the IListComparer before each search. This cannot be done
+                    // any less frequently (e.g. in Root.AddToSubgroups), due to the
+                    // possibility that the item may appear in more than one subgroup.
+                    listComparer.Reset();
+                }
+                
                 // if (comparer is CollectionViewGroupComparer groupComparer)
                 // {
                 //     // reset the CollectionViewGroupComparer before each search. This cannot be done
@@ -230,7 +231,7 @@ namespace Mvolonia.Controls.Collections
 
                 for (index = low; index < high; ++index)
                 {
-                    object seed1 = (ProtectedItems[index] is CollectionViewGroupInternal subgroup) ? subgroup.SeedItem : ProtectedItems[index];
+                    var seed1 = (ProtectedItems[index] is CollectionViewGroupInternal subgroup) ? subgroup.SeedItem : ProtectedItems[index];
                     if (seed1 == AvaloniaProperty.UnsetValue)
                     {
                         continue;

@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using Avalonia.Collections;
+using Mvolonia.Controls.Collections.Comparers;
 
 namespace Mvolonia.Controls.Collections
 {
@@ -32,7 +33,20 @@ namespace Mvolonia.Controls.Collections
         }
 
         public bool IsGrouping { get; private set; }
-        
+
+        private Type _itemType;
+
+        private Type ItemType
+        {
+            get
+            {
+                //    if (_itemType == null)
+                //        _itemType = GetItemType(true);
+
+                return _itemType;
+            }
+        }
+
 
         CollectionViewGroup ICollectionView.FindGroupContainingItem(object item) =>
             FindGroupContainingItem(_rootGroup, item);
@@ -50,6 +64,7 @@ namespace Mvolonia.Controls.Collections
                     continue;
                 return subgroup;
             }
+
             return null;
         }
 
@@ -58,7 +73,7 @@ namespace Mvolonia.Controls.Collections
         /// </summary>
         public AvaloniaList<GroupDescription> GroupDescriptions =>
             _rootGroup.GroupDescriptions;
-        
+
         /// <summary>
         /// Collection of Sort criteria to sort items in this view over the SourceCollection.
         /// </summary>
@@ -83,21 +98,21 @@ namespace Mvolonia.Controls.Collections
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        
-        
+
+
         /// <summary>
         /// Set new SortDescription collection; re-hook collection change notification handler
         /// </summary>
-        /// <param name="descriptions">SortDescriptionCollection to set the property value to</param>
+        /// <param name="descriptions">SortDescriptionCollection to set the property addedItem to</param>
         private void SetSortDescriptions(SortDescriptionCollection descriptions)
         {
             if (_sortDescriptions != null)
                 _sortDescriptions.CollectionChanged -= SortDescriptionsChanged;
-            
+
 
             _sortDescriptions = descriptions;
 
-            if (_sortDescriptions is null) 
+            if (_sortDescriptions is null)
                 return;
             Debug.Assert(_sortDescriptions.Count == 0, "must be empty SortDescription collection");
             _sortDescriptions.CollectionChanged += SortDescriptionsChanged;
@@ -105,7 +120,6 @@ namespace Mvolonia.Controls.Collections
 
         private void SortDescriptionsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            
         }
 
         private void OnGroupByChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -130,7 +144,7 @@ namespace Mvolonia.Controls.Collections
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    ProcessAddEvent(addedItem);
+                    ProcessAddEvent(addedItem, args.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
@@ -146,7 +160,7 @@ namespace Mvolonia.Controls.Collections
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
             if (args.Action != NotifyCollectionChangedAction.Replace)
                 OnPropertyChanged(nameof(Count));
         }
@@ -160,18 +174,25 @@ namespace Mvolonia.Controls.Collections
             Refresh();
 
 
-        private void ProcessAddEvent(object value)
+        private void ProcessAddEvent(object addedItem, int addIndex)
         {
-            _rootGroup.AddToSubgroups(value, false);
-            var addedIndex = InsertToInternalList(value);
-            
+            ProcessInsertToCollection(addedItem, addIndex);
+
+            PrepareGroupingComparer(_rootGroup);
+
+            var addedIndex = IndexOf(addedItem);
+
             if (addedIndex < 0)
                 return;
+
+            if (IsGrouping)
+                _rootGroup.AddToSubgroups(addedItem, false);
+
 
             OnCollectionChanged(
                 new NotifyCollectionChangedEventArgs(
                     NotifyCollectionChangedAction.Add,
-                    value,
+                    addedItem,
                     addedIndex));
         }
 
@@ -189,14 +210,58 @@ namespace Mvolonia.Controls.Collections
                     removedIndex));
         }
 
+        /// <summary>
+        /// Handles adding an item into the collection, and applying sorting, filtering, grouping, paging.
+        /// </summary>
+        /// <param name="item">Item to insert in the collection</param>
+        /// <param name="index">Index to insert item into</param>
+        private void ProcessInsertToCollection(object item, int index)
+        {
+            // first check to see if it passes the filter
+            if (SortDescriptions.Count > 0)
+            {
+                // var itemType = ItemType;
+                // foreach (var sort in SortDescriptions)
+                //     sort.Initialize(itemType);
+
+                // create the SortFieldComparer to use
+                var sortFieldComparer = new MergedComparer(this);
+
+                // check if the item would be in sorted order if inserted into the specified index
+                // otherwise, calculate the correct sorted index
+                if (index < 0 || /* if item was not originally part of list */
+                    (index > 0 &&
+                     (sortFieldComparer.Compare(item, InternalItemAt(index - 1)) <
+                      0)) || /* item has moved up in the list */
+                    ((index < _internalList.Count - 1) &&
+                     (sortFieldComparer.Compare(item, InternalItemAt(index)) >
+                      0))) /* item has moved down in the list */
+                {
+                    index = sortFieldComparer.FindInsertIndex(item, _internalList);
+                }
+            }
+
+            // make sure that the specified insert index is within the valid range
+            // otherwise, just add it to the end. the index can be set to an invalid
+            // addedItem if the item was originally not in the collection, on a different
+            // page, or if it had been previously filtered out.
+            if (index < 0 || index > _internalList.Count)
+            {
+                index = _internalList.Count;
+            }
+
+            _internalList.Insert(index, item);
+        }
+
+
         private int InsertToInternalList(object item)
         {
             var index = _rootGroup.LeafIndexOf(item);
             // make sure that the specified insert index is within the valid range
             // otherwise, just add it to the end. the index can be set to an invalid
-            // value if the item was originally not in the collection, on a different
+            // addedItem if the item was originally not in the collection, on a different
             // page, or if it had been previously filtered out.
-            
+
             if (index < 0 || index > _internalList.Count)
                 index = _internalList.Count;
 
@@ -216,6 +281,21 @@ namespace Mvolonia.Controls.Collections
         {
             CopySourceToInternalList();
             PrepareGroups();
+        }
+
+        /// <summary>
+        /// Sets up the ActiveComparer for the CollectionViewGroupRoot specified
+        /// </summary>
+        /// <param name="groupRoot">The CollectionViewGroupRoot</param>
+        private void PrepareGroupingComparer(CollectionViewGroupRoot groupRoot)
+        {
+            if (groupRoot.ActiveComparer is ListComparer listComparer)
+            {
+                listComparer.ResetList(_internalList);
+                return;
+            }
+
+            groupRoot.ActiveComparer = new ListComparer(_internalList);
         }
 
         private void PrepareGroups()
@@ -241,6 +321,7 @@ namespace Mvolonia.Controls.Collections
             }
 
             IsGrouping = _rootGroup.GroupBy != null;
+            PrepareGroupingComparer(_rootGroup);
         }
 
 
@@ -272,6 +353,23 @@ namespace Mvolonia.Controls.Collections
             while (enumerator.MoveNext())
                 _internalList.Add(enumerator.Current);
         }
+
+        /// <summary>
+        /// Return index of item in the internal list.
+        /// </summary>
+        /// <param name="item">The item we are checking</param>
+        /// <returns>Integer value on where in the InternalList the object is located</returns>
+        private int InternalIndexOf(object item) =>
+            _internalList.IndexOf(item);
+
+
+        /// <summary>
+        /// Return item at the given index in the internal list.
+        /// </summary>
+        /// <param name="index">The index we are checking</param>
+        /// <returns>The item at the specified index</returns>
+        private object InternalItemAt(int index) =>
+            index >= 0 && index < _internalList.Count ? _internalList[index] : null;
 
         public int Count =>
             _internalList.Count;

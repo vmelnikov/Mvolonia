@@ -33,6 +33,7 @@ namespace ControlCatalog.ViewModels
             var collectionView = new CollectionView(employees);
             collectionView.GroupDescriptions.Add(new PropertyGroupDescription("Company"));
             collectionView.GroupDescriptions.Add(new PropertyGroupDescription("Gender"));
+            collectionView.SortDescriptions.Add(SortDescription.FromPropertyName("FirstName"));
             return collectionView;
         }
 
