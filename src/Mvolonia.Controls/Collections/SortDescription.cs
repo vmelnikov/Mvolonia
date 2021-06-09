@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace Mvolonia.Controls.Collections
 {
@@ -8,17 +10,22 @@ namespace Mvolonia.Controls.Collections
     /// </summary>
     public abstract class SortDescription
     {
+        public static PropertySortDescription FromPropertyName(string propertyName,
+            ListSortDirection direction = ListSortDirection.Ascending, CultureInfo culture = null) =>
+            new PropertySortDescription(propertyName, direction, culture);
+
+
         private ListSortDirection _direction;
 
         public SortDescription(ListSortDirection direction)
         {
             if (direction != ListSortDirection.Ascending && direction != ListSortDirection.Descending)
-                throw new InvalidEnumArgumentException(nameof(direction), (int)direction, typeof(ListSortDirection));
+                throw new InvalidEnumArgumentException(nameof(direction), (int) direction, typeof(ListSortDirection));
             _direction = direction;
             IsSealed = false;
         }
-        
-        
+
+
         /// <summary>
         /// Sort direction.
         /// </summary>
@@ -36,7 +43,9 @@ namespace Mvolonia.Controls.Collections
                 _direction = value;
             }
         }
-        
+
+        public abstract IComparer<object> Comparer { get; }
+
         /// <summary>
         /// Returns true if the SortDescription is in use (sealed).
         /// </summary>
@@ -45,6 +54,5 @@ namespace Mvolonia.Controls.Collections
 
         internal void Seal() =>
             IsSealed = true;
-        
     }
 }
