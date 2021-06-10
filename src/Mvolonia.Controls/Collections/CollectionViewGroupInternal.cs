@@ -13,7 +13,7 @@ namespace Mvolonia.Controls.Collections
         {
             Parent = parent;
         }
-        
+
         /// <summary>
         /// Returns an enumerator over the leaves governed by this group
         /// </summary>
@@ -24,19 +24,19 @@ namespace Mvolonia.Controls.Collections
         internal CollectionViewGroupInternal Parent { get; }
 
         internal int FullCount { get; set; }
-        
+
         internal GroupDescription GroupBy
         {
-            get => _groupBy; 
+            get => _groupBy;
             set
             {
                 if (_groupBy != null)
-                    ((INotifyPropertyChanged)_groupBy).PropertyChanged -= OnGroupByChanged;
-                
+                    ((INotifyPropertyChanged) _groupBy).PropertyChanged -= OnGroupByChanged;
+
                 _groupBy = value;
 
                 if (_groupBy != null)
-                    ((INotifyPropertyChanged)_groupBy).PropertyChanged += OnGroupByChanged;
+                    ((INotifyPropertyChanged) _groupBy).PropertyChanged += OnGroupByChanged;
             }
         }
 
@@ -44,7 +44,7 @@ namespace Mvolonia.Controls.Collections
         /// Gets or sets the most recent index where activity took place
         /// </summary>
         internal int LastIndex { get; set; }
-        
+
         /// <summary>
         /// Gets the first item (leaf) added to this group.  If this can't be determined,
         /// DependencyProperty.UnsetValue.
@@ -89,7 +89,7 @@ namespace Mvolonia.Controls.Collections
         {
             throw new System.NotImplementedException();
         }
-        
+
         /// <summary>
         /// Update the item count of the CollectionViewGroup
         /// </summary>
@@ -104,15 +104,14 @@ namespace Mvolonia.Controls.Collections
                 group = group.Parent)
             {
                 group.FullCount += delta;
-                if (!changeLeafCount) 
+                if (!changeLeafCount)
                     continue;
-                
+
                 group.ProtectedItemCount += delta;
 
                 if (group.ProtectedItemCount == 0)
                     RemoveEmptyGroup(group);
             }
-            
         }
 
         /// <summary>
@@ -131,7 +130,7 @@ namespace Mvolonia.Controls.Collections
 
             // remove the subgroup unless it is one of the explicit groups
             if (index >= groupBy.GroupKeys.Count)
-                parent.Remove(group, false); 
+                parent.Remove(group, false);
         }
 
         /// <summary>
@@ -145,11 +144,11 @@ namespace Mvolonia.Controls.Collections
             var index = -1;
             var localIndex = ProtectedItems.IndexOf(item);
 
-            if (localIndex < 0) 
+            if (localIndex < 0)
                 return index;
             if (returnLeafIndex)
                 index = LeafIndexFromItem(null, localIndex);
-            
+
             ChangeCounts(item, -1);
             ProtectedItems.RemoveAt(localIndex);
             return index;
@@ -164,7 +163,7 @@ namespace Mvolonia.Controls.Collections
             ChangeCounts(item, +1);
             ProtectedItems.Add(item);
         }
-        
+
         /// <summary>
         /// Insert a new item or subgroup and return its index.  Seed is a
         /// representative from the subgroup (or the item itself) that
@@ -187,7 +186,7 @@ namespace Mvolonia.Controls.Collections
 
             return index;
         }
-        
+
         /// <summary>
         /// Clears the collection of items
         /// </summary>
@@ -197,7 +196,7 @@ namespace Mvolonia.Controls.Collections
             FullCount = 1;
             ProtectedItemCount = 0;
         }
-        
+
         /// <summary>
         /// Finds the index of the specified item
         /// </summary>
@@ -220,7 +219,7 @@ namespace Mvolonia.Controls.Collections
                     // possibility that the item may appear in more than one subgroup.
                     listComparer.Reset();
                 }
-                
+
                 // if (comparer is CollectionViewGroupComparer groupComparer)
                 // {
                 //     // reset the CollectionViewGroupComparer before each search. This cannot be done
@@ -231,11 +230,14 @@ namespace Mvolonia.Controls.Collections
 
                 for (index = low; index < high; ++index)
                 {
-                    var seed1 = (ProtectedItems[index] is CollectionViewGroupInternal subgroup) ? subgroup.SeedItem : ProtectedItems[index];
+                    var seed1 = (ProtectedItems[index] is CollectionViewGroupInternal subgroup)
+                        ? subgroup.SeedItem
+                        : ProtectedItems[index];
                     if (seed1 == AvaloniaProperty.UnsetValue)
                     {
                         continue;
                     }
+
                     if (comparer.Compare(seed, seed1) < 0)
                     {
                         break;
@@ -249,7 +251,36 @@ namespace Mvolonia.Controls.Collections
 
             return index;
         }
-        
+
+        /// <summary>
+        /// Return the item at the given index within the list of leaves governed
+        /// by this group
+        /// </summary>
+        /// <param name="index">Index of the leaf</param>
+        /// <returns>Item at given index</returns>
+        internal object LeafAt(int index)
+        {
+            for (int k = 0, n = Items.Count; k < n; ++k)
+            {
+                if (Items[k] is CollectionViewGroupInternal subgroup)
+                {
+                    // current item is a group - either drill in, or skip over
+                    if (index < subgroup.ItemCount)
+                        return subgroup.LeafAt(index);
+                    index -= subgroup.ItemCount;
+                }
+                else
+                {
+                    // current item is a leaf - see if we're done
+                    if (index == 0)
+                        return Items[k];
+                    index -= 1;
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Returns the index of the given item within the list of leaves governed
         /// by the full group structure.  The item must be a (direct) child of this
@@ -286,7 +317,7 @@ namespace Mvolonia.Controls.Collections
 
             return result;
         }
-        
+
         /// <summary>
         /// Returns the index of the given item within the list of leaves governed
         /// by this group
@@ -295,7 +326,7 @@ namespace Mvolonia.Controls.Collections
         /// <returns>Number of items under that leaf</returns>
         internal int LeafIndexOf(object item)
         {
-            var leaves = 0;         // number of leaves we've passed over so far
+            var leaves = 0; // number of leaves we've passed over so far
             for (int k = 0, n = Items.Count; k < n; ++k)
             {
                 if (Items[k] is CollectionViewGroupInternal subgroup)
@@ -303,18 +334,18 @@ namespace Mvolonia.Controls.Collections
                     var subgroupIndex = subgroup.LeafIndexOf(item);
                     if (subgroupIndex < 0)
                     {
-                        leaves += subgroup.ItemCount;       // item not in this subgroup
+                        leaves += subgroup.ItemCount; // item not in this subgroup
                     }
                     else
                     {
-                        return leaves + subgroupIndex;    // item is in this subgroup
+                        return leaves + subgroupIndex; // item is in this subgroup
                     }
                 }
                 else
                 {
                     // current item is a leaf - compare it directly
-                    
-                    
+
+
                     if (Equals(item, Items[k]))
                     {
                         return leaves;
