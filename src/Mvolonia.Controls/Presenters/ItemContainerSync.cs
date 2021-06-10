@@ -122,11 +122,11 @@ namespace Mvolonia.Controls.Presenters
 
             foreach (var item in items)
             {
+    
                 var materialized = generator.Materialize(index++, item);
 
                 AddContainerToGroupItem(panel, collectionView.FindGroupContainingItem(item), materialized);
-
-
+                
                 result.Add(materialized);
             }
 
@@ -183,6 +183,8 @@ namespace Mvolonia.Controls.Presenters
 
         private static GroupItem GetOrAddGroupItem(CollectionViewGroup group, IPanel panel)
         {
+            if (!(group is CollectionViewGroupInternal groupInternal))
+                throw new ArgumentException();
             var groupItem = panel.Children.OfType<GroupItem>()
                 .FirstOrDefault(c => Equals(c.ViewGroup, group));
 
@@ -192,7 +194,10 @@ namespace Mvolonia.Controls.Presenters
             {
                 ViewGroup = group
             };
-            panel.Children.Add(groupItem);
+            var index = groupInternal.Parent?.Items.IndexOf(group) ?? -1;
+            if (index < 0)
+                index = panel.Children.Count;
+            panel.Children.Insert(index, groupItem);
             groupItem.ApplyTemplate();
             return groupItem;
         }
