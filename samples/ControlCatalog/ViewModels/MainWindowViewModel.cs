@@ -18,6 +18,7 @@ namespace ControlCatalog.ViewModels
         {
             FillDefaultEmployees();
             GroupedEmployees = CreateGroupedEmployees(_employees);
+            SelectedItems.CollectionChanged += (sender, args) => { };
         }
 
         public AvaloniaList<Employee> SelectedItems { get; } = new();

@@ -210,16 +210,18 @@ namespace Mvolonia.Controls.Collections
 
         private void ProcessRemoveEvent(object value)
         {
-            var removedIndex = RemoveItemFromInternalList(value);
-            _rootGroup.RemoveFromSubgroups(value);
-            if (removedIndex < 0)
+            var index = IndexOf(value);
+            if (index < 0)
                 return;
+            _internalList.Remove(value);
+            _rootGroup.RemoveFromSubgroups(value);
+
 
             OnCollectionChanged(
                 new NotifyCollectionChangedEventArgs(
                     NotifyCollectionChangedAction.Remove,
                     value,
-                    removedIndex));
+                    index));
         }
 
         /// <summary>
