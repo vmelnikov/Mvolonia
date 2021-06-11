@@ -170,11 +170,10 @@ namespace Mvolonia.Controls.Presenters
 
         private static void AddContainerToPanel(IPanel panel, CollectionViewGroup group, ItemContainerInfo container)
         {
-            if (panel is null)
-                throw new ArgumentNullException();
             if (group is null)
                 throw new ArgumentNullException();
-
+            if (panel is null)
+                return;
             var index = group.Items.IndexOf(container.Item);
             if (index < 0 || index > panel.Children.Count)
                 index = panel.Children.Count;
