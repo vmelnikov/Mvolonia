@@ -53,7 +53,7 @@ namespace Mvolonia.Controls.Collections
         {
             get
             {
-                if (ItemCount > 0 && (GroupBy is null || GroupBy.GroupKeys.Count == 0))
+                if (ItemCount > 0 && (GroupBy is null || GroupBy.GroupNames.Count == 0))
                 {
                     // look for first item, child by child
                     for (int k = 0, n = Items.Count; k < n; ++k)
@@ -129,7 +129,7 @@ namespace Mvolonia.Controls.Collections
             var index = parent.ProtectedItems.IndexOf(group);
 
             // remove the subgroup unless it is one of the explicit groups
-            if (index >= groupBy.GroupKeys.Count)
+            if (index >= groupBy.GroupNames.Count)
                 parent.Remove(group, false);
         }
 
@@ -177,7 +177,7 @@ namespace Mvolonia.Controls.Collections
         internal int Insert(object item, object seed, IComparer comparer)
         {
             // never insert the new item/group before the explicit subgroups
-            var low = GroupBy?.GroupKeys.Count ?? 0;
+            var low = GroupBy?.GroupNames.Count ?? 0;
             int index = FindIndex(item, seed, comparer, low, ProtectedItems.Count);
 
             // now insert the item

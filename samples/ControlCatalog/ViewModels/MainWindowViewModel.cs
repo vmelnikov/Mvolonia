@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.ComponentModel;
 using System.Linq;
 using Avalonia.Collections;
 using Bogus;
@@ -31,10 +32,13 @@ namespace ControlCatalog.ViewModels
 
         private static CollectionView CreateGroupedEmployees(IEnumerable employees)
         {
+            var companyGroupDescription = new PropertyGroupDescription(nameof(Employee.Company));
+            companyGroupDescription.GroupNames.Add("Empty Company");
+            var genderGroupDescription = new PropertyGroupDescription(nameof(Employee.Gender));
             var collectionView = new CollectionView(employees);
-            collectionView.GroupDescriptions.Add(new PropertyGroupDescription("Company"));
-            collectionView.GroupDescriptions.Add(new PropertyGroupDescription("Gender"));
-            collectionView.SortDescriptions.Add(SortDescription.FromPropertyName("FirstName"));
+            collectionView.GroupDescriptions.Add(companyGroupDescription);
+            collectionView.GroupDescriptions.Add(genderGroupDescription);
+            collectionView.SortDescriptions.Add(SortDescription.FromPropertyName(nameof(Employee.SecondName), ListSortDirection.Descending));
             return collectionView;
         }
 

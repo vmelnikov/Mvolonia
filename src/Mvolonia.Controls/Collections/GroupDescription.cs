@@ -12,17 +12,17 @@ namespace Mvolonia.Controls.Collections
     /// </summary>
     public abstract class GroupDescription : INotifyPropertyChanged
     {
-        public AvaloniaList<object> GroupKeys { get; }
+        public AvaloniaList<object> GroupNames { get; }
 
         protected GroupDescription()
         {
-            GroupKeys = new AvaloniaList<object>();
-            GroupKeys.CollectionChanged += (sender, e) => OnPropertyChanged(new PropertyChangedEventArgs(nameof(GroupKeys)));
+            GroupNames = new AvaloniaList<object>();
+            GroupNames.CollectionChanged += (sender, e) => OnPropertyChanged(new PropertyChangedEventArgs(nameof(GroupNames)));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        private void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(this, e);
         }

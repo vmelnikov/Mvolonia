@@ -39,7 +39,7 @@ namespace Mvolonia.Controls.Presenters
 
             void Remove()
             {
-                RemoveContainers(panel, generator.RemoveRange(e.OldStartingIndex, e.OldItems.Count));
+                RemoveContainers(owner, generator.RemoveRange(e.OldStartingIndex, e.OldItems.Count));
             }
 
             switch (e.Action)
@@ -53,7 +53,7 @@ namespace Mvolonia.Controls.Presenters
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    RemoveContainers(panel, generator.Dematerialize(e.OldStartingIndex, e.OldItems.Count));
+                    RemoveContainers(owner, generator.Dematerialize(e.OldStartingIndex, e.OldItems.Count));
                     var containers = AddContainers(owner, e.NewStartingIndex, e.NewItems);
 
                     var i = e.NewStartingIndex;
@@ -71,7 +71,7 @@ namespace Mvolonia.Controls.Presenters
                     break;
 
                 case NotifyCollectionChangedAction.Reset:
-                    RemoveContainers(panel, generator.Clear());
+                    RemoveContainers(owner, generator.Clear());
 
                     if (items != null)
                     {
@@ -122,15 +122,42 @@ namespace Mvolonia.Controls.Presenters
 
             foreach (var item in items)
             {
-    
                 var materialized = generator.Materialize(index++, item);
 
                 AddContainerToGroupItem(panel, collectionView.FindGroupContainingItem(item), materialized);
-                
+
                 result.Add(materialized);
             }
 
             return result;
+        }
+
+        public static void FillExplicitGroupItems(IItemsPresenter owner)
+        {
+            var panel = owner.Panel;
+            if (!(owner.Items is ICollectionView collectionView))
+                return;
+            if (!collectionView.IsGrouping)
+                return;
+            if (panel is null)
+                return;
+            AddExplicitGroupItemsToPanel(panel, 0, collectionView.RootGroup.Items);
+        }
+
+        private static void AddExplicitGroupItemsToPanel(IPanel panel, int index, IEnumerable items)
+        {
+            foreach (var item in items)
+            {
+                if (!(item is CollectionViewGroupInternal group))
+                    continue;
+                var groupItem = new GroupItem
+                {
+                    ViewGroup = group
+                };
+                panel.Children.Insert(index, groupItem);
+                groupItem.ApplyTemplate();
+                index++;
+            }
         }
 
         private static void AddContainerToGroupItem(IPanel panel, CollectionViewGroup group,
@@ -141,7 +168,6 @@ namespace Mvolonia.Controls.Presenters
             var containerPath = GetContainerPath(group, container);
 
             AddContainerPathToPanel(containerPath, panel);
-            
         }
 
         private static void AddContainerPathToPanel(IList<object> containerPath, IPanel panel)
@@ -161,11 +187,10 @@ namespace Mvolonia.Controls.Presenters
                     }
                     case ItemContainerInfo container:
                         AddContainerToPanel(panel, group, container);
-                        
+
                         break;
                 }
             }
-
         }
 
         private static void AddContainerToPanel(IPanel panel, CollectionViewGroup group, ItemContainerInfo container)
@@ -177,7 +202,7 @@ namespace Mvolonia.Controls.Presenters
             var index = group.Items.IndexOf(container.Item);
             if (index < 0 || index > panel.Children.Count)
                 index = panel.Children.Count;
-            panel.Children.Insert(index, container.ContainerControl); 
+            panel.Children.Insert(index, container.ContainerControl);
         }
 
         private static GroupItem GetOrAddGroupItem(CollectionViewGroup group, IPanel panel)
@@ -187,14 +212,14 @@ namespace Mvolonia.Controls.Presenters
             var groupItem = panel.Children.OfType<GroupItem>()
                 .FirstOrDefault(c => Equals(c.ViewGroup, group));
 
-            if (!(groupItem is null)) 
+            if (!(groupItem is null))
                 return groupItem;
             groupItem = new GroupItem
             {
                 ViewGroup = group
             };
             var index = groupInternal.Parent?.Items.IndexOf(group) ?? -1;
-            if (index < 0)
+            if (index < 0 || index > panel.Children.Count)
                 index = panel.Children.Count;
             panel.Children.Insert(index, groupItem);
             groupItem.ApplyTemplate();
@@ -215,19 +240,19 @@ namespace Mvolonia.Controls.Presenters
 
 
         private static void RemoveContainers(
-            IPanel panel,
+            IItemsPresenter owner,
             IEnumerable<ItemContainerInfo> items)
         {
             foreach (var i in items)
             {
                 if (i.ContainerControl != null)
                 {
-                    RemoveControl(panel, i.ContainerControl);
+                    RemoveControl(owner, owner?.Panel, i.ContainerControl);
                 }
             }
         }
 
-        private static void RemoveControl(IPanel panel, IControl control)
+        private static void RemoveControl(IItemsPresenter owner, IPanel panel, IControl control)
         {
             for (var i = panel.Children.Count - 1; i >= 0; i--)
             {
@@ -241,11 +266,22 @@ namespace Mvolonia.Controls.Presenters
 
                 if (child is IGroupItem groupItem)
                 {
-                    RemoveControl(groupItem.Panel, control);
-                    if (groupItem.IsEmpty)
-                        panel.Children.RemoveAt(i);
+                    RemoveControl(owner, groupItem.Panel, control);
+                    CheckAndRemoveGroupItem(owner, panel, groupItem);
                 }
             }
+        }
+
+        private static void CheckAndRemoveGroupItem(IItemsPresenter owner, IPanel panel, IGroupItem groupItem)
+        {
+            if (!(owner.Items is ICollectionView collectionView))
+                return;
+            if (!groupItem.IsEmpty)
+                return;
+            if (collectionView.ContainsGroup(groupItem.ViewGroup))
+                return;
+
+            panel.Children.Remove(groupItem);
         }
     }
 }

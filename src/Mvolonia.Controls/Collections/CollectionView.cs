@@ -35,6 +35,8 @@ namespace Mvolonia.Controls.Collections
 
         public bool IsGrouping { get; private set; }
 
+        CollectionViewGroupRoot ICollectionView.RootGroup => _rootGroup;
+
         private Type _itemType;
 
         private Type ItemType
@@ -61,6 +63,24 @@ namespace Mvolonia.Controls.Collections
         CollectionViewGroup ICollectionView.FindGroupContainingItem(object item) =>
             FindGroupContainingItem(_rootGroup, item);
 
+        bool ICollectionView.ContainsGroup(CollectionViewGroup group) =>
+            ContainsGroup(_rootGroup, group);
+
+        private static bool ContainsGroup(CollectionViewGroup parentGroup, CollectionViewGroup group)
+        {
+            foreach (var item in parentGroup.Items)
+            {
+                if (item.Equals(group))
+                    return true;
+                if (!(item is CollectionViewGroup collectionViewGroup))
+                    continue;
+                var res = ContainsGroup(collectionViewGroup, group);
+                if (res)
+                    return true;
+            }
+
+            return false;
+        }
 
         private static CollectionViewGroup FindGroupContainingItem(CollectionViewGroup group, object item)
         {
