@@ -16,7 +16,7 @@ namespace Mvolonia.Controls
         public bool IsEmpty => Panel?.Children?.Count == 0;
 
         public IPanel Panel { get; private set; }
-        
+
         internal CollectionViewGroup ViewGroup
         {
             get => _viewGroup;
@@ -29,6 +29,8 @@ namespace Mvolonia.Controls
                 UpdateHeader();
             }
         }
+
+        CollectionViewGroup IGroupItem.ViewGroup => _viewGroup;
 
         private static int GetViewGroupLevel(CollectionViewGroupInternal group)
         {

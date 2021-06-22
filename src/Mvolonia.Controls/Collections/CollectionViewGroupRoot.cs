@@ -276,7 +276,7 @@ namespace Mvolonia.Controls.Collections
             group.GroupBy = groupDescription;
 
             // create subgroups for each of the explicit names
-            var keys = groupDescription?.GroupKeys;
+            var keys = groupDescription?.GroupNames;
             if (keys != null)
             {
                 for (int k = 0, n = keys.Count; k < n; ++k)

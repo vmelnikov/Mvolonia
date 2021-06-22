@@ -17,6 +17,7 @@ namespace Mvolonia.Controls.Presenters
         {
             if (Items != null && owner.Panel != null)
             {
+                ItemContainerSync.FillExplicitGroupItems(Owner);
                 ItemContainerSync.AddContainers(Owner, 0, Items);
             }
         }
