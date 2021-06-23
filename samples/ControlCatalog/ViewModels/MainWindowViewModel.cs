@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Avalonia.Collections;
@@ -34,13 +35,14 @@ namespace ControlCatalog.ViewModels
         {
             var companyGroupDescription = new PropertyGroupDescription(nameof(Employee.Company));
             companyGroupDescription.GroupNames.Add("Empty Company");
-            
+
             var genderGroupDescription = new PropertyGroupDescription(nameof(Employee.Gender));
             genderGroupDescription.GroupNames.Add("Male");
             var collectionView = new CollectionView(employees);
             collectionView.GroupDescriptions.Add(companyGroupDescription);
             collectionView.GroupDescriptions.Add(genderGroupDescription);
-            collectionView.SortDescriptions.Add(SortDescription.FromPropertyName(nameof(Employee.SecondName), ListSortDirection.Descending));
+            collectionView.SortDescriptions.Add(SortDescription.FromPropertyName(nameof(Employee.SecondName),
+                ListSortDirection.Descending));
             return collectionView;
         }
 
@@ -51,6 +53,9 @@ namespace ControlCatalog.ViewModels
 
         public void OnDeleteSelectedCommand() =>
             DeleteSelected();
+
+        public void OnChangeSelectedSecondNameCommand() =>
+            ChangeSelectedSecondName();
 
         public void OnAddToRandomGroupCommand() =>
             AddToRandomGroup();
@@ -63,13 +68,31 @@ namespace ControlCatalog.ViewModels
             _employees.Add(faker.Generate());
         }
 
+        private void ChangeSelectedSecondName()
+        {
+            var faker = new Faker<string>().CustomInstantiator(f => f.Name.LastName());
+            var selectedItems = SelectedItems.ToList();
+            SelectedItems.Clear();
+            var toAdd = new List<Employee>();
+            foreach (var selectedItem in selectedItems)
+            {
+                var index = _employees.IndexOf(selectedItem);
+                var newItem = new Employee(selectedItem.FirstName, faker.Generate(), selectedItem.Company,
+                    selectedItem.Gender);
+                _employees[index] = newItem;
+                toAdd.Add(_employees[index]);
+            }
+
+            SelectedItems.AddRange(toAdd);
+        }
+
         public void AddNewMaleCommand(string company)
         {
             var faker = new Faker<Employee>()
                 .CustomInstantiator(f => new Employee(f.Name.FirstName(), f.Name.LastName(), company, "Male"));
             _employees.Add(faker.Generate());
         }
-        
+
         public void AddNewFemaleCommand(string company)
         {
             var faker = new Faker<Employee>()

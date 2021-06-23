@@ -10,7 +10,7 @@ using Mvolonia.Controls.Collections.Comparers;
 
 namespace Mvolonia.Controls.Collections
 {
-    public class CollectionView : ICollectionView, INotifyPropertyChanged
+    public class CollectionView : ICollectionView, IList<object>, INotifyPropertyChanged
     {
         private IList _internalList;
 
@@ -185,7 +185,8 @@ namespace Mvolonia.Controls.Collections
                     ProcessRemoveEvent(removedItem);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    ProcessReplaceEvent(removedItem, addedItem);
+                    ProcessRemoveEvent(removedItem);
+                    ProcessAddEvent(addedItem, args.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     ProcessResetEvent();
@@ -197,11 +198,7 @@ namespace Mvolonia.Controls.Collections
             if (args.Action != NotifyCollectionChangedAction.Replace)
                 OnPropertyChanged(nameof(Count));
         }
-
-        private void ProcessReplaceEvent(object oldValue, object newValue)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         private void ProcessResetEvent() =>
             Refresh();
@@ -381,6 +378,9 @@ namespace Mvolonia.Controls.Collections
         private void OnPropertyChanged(PropertyChangedEventArgs e) =>
             PropertyChanged?.Invoke(this, e);
 
+        
+        IEnumerator<object> IEnumerable<object>.GetEnumerator() =>
+            throw new NotSupportedException();
 
         public IEnumerator GetEnumerator() =>
             IsGrouping
@@ -410,6 +410,9 @@ namespace Mvolonia.Controls.Collections
         private object InternalItemAt(int index) =>
             index >= 0 && index < _internalList.Count ? _internalList[index] : null;
 
+        bool ICollection<object>.Remove(object item)=>
+            throw new NotSupportedException();
+
         public int Count =>
             _internalList.Count;
 
@@ -425,11 +428,17 @@ namespace Mvolonia.Controls.Collections
         public int Add(object value) =>
             throw new NotSupportedException();
 
+        void ICollection<object>.Add(object item) =>
+            throw new NotSupportedException();
+
         public void Clear() =>
             throw new NotSupportedException();
 
         public bool Contains(object value) =>
             _internalList.Contains(value);
+
+        public void CopyTo(object[] array, int arrayIndex)=>
+            throw new NotSupportedException();
 
         public int IndexOf(object value) =>
             IsGrouping
