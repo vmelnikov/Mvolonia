@@ -34,7 +34,9 @@ namespace ControlCatalog.ViewModels
         {
             var companyGroupDescription = new PropertyGroupDescription(nameof(Employee.Company));
             companyGroupDescription.GroupNames.Add("Empty Company");
+            
             var genderGroupDescription = new PropertyGroupDescription(nameof(Employee.Gender));
+            genderGroupDescription.GroupNames.Add("Male");
             var collectionView = new CollectionView(employees);
             collectionView.GroupDescriptions.Add(companyGroupDescription);
             collectionView.GroupDescriptions.Add(genderGroupDescription);
