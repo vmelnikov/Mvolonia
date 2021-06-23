@@ -12,6 +12,9 @@ namespace Mvolonia.Controls.Collections
     /// </summary>
     public abstract class GroupDescription : INotifyPropertyChanged
     {
+        /// <summary>
+        /// Names of explicit groups
+        /// </summary>
         public AvaloniaList<object> GroupNames { get; }
 
         protected GroupDescription()

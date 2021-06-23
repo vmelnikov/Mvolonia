@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Presenters;
@@ -82,6 +81,18 @@ namespace Mvolonia.Controls.Presenters
             }
         }
 
+        public static void FillExplicitGroupItems(IItemsPresenter owner)
+        {
+            var panel = owner.Panel;
+            if (!(owner.Items is ICollectionView collectionView))
+                return;
+            if (!collectionView.IsGrouping)
+                return;
+            if (panel is null)
+                return;
+            AddGroupItemsToPanel(panel, 0, collectionView.RootGroup.Items);
+        }
+
         public static IList<ItemContainerInfo> AddContainers(
             IItemsPresenter owner,
             int index,
@@ -132,20 +143,10 @@ namespace Mvolonia.Controls.Presenters
             return result;
         }
 
-        public static void FillExplicitGroupItems(IItemsPresenter owner)
+        private static void AddGroupItemsToPanel(IPanel panel, int index, IEnumerable items)
         {
-            var panel = owner.Panel;
-            if (!(owner.Items is ICollectionView collectionView))
-                return;
-            if (!collectionView.IsGrouping)
-                return;
             if (panel is null)
                 return;
-            AddExplicitGroupItemsToPanel(panel, 0, collectionView.RootGroup.Items);
-        }
-
-        private static void AddExplicitGroupItemsToPanel(IPanel panel, int index, IEnumerable items)
-        {
             foreach (var item in items)
             {
                 if (!(item is CollectionViewGroupInternal group))
@@ -156,6 +157,7 @@ namespace Mvolonia.Controls.Presenters
                 };
                 panel.Children.Insert(index, groupItem);
                 groupItem.ApplyTemplate();
+                AddGroupItemsToPanel(groupItem.Panel, 0, group.Items);
                 index++;
             }
         }
@@ -223,6 +225,7 @@ namespace Mvolonia.Controls.Presenters
                 index = panel.Children.Count;
             panel.Children.Insert(index, groupItem);
             groupItem.ApplyTemplate();
+            AddGroupItemsToPanel(groupItem.Panel, 0, group.Items);
             return groupItem;
         }
 
