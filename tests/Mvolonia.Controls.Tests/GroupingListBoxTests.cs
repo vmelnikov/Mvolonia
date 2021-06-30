@@ -30,7 +30,7 @@ namespace Mvolonia.Controls.Tests
                 collectionView.GroupDescriptions.Add(new PropertyGroupDescription("Company"));
 
 
-                var target = new GroupingListBox()
+                var target = new GroupableListBox()
                 {
                     Template = GroupingListBoxTemplate(),
                     Items = collectionView
@@ -58,7 +58,7 @@ namespace Mvolonia.Controls.Tests
                 collectionView.GroupDescriptions.Add(new PropertyGroupDescription("Company"));
 
 
-                var target = new GroupingListBox()
+                var target = new GroupableListBox()
                 {
                     Template = GroupingListBoxTemplate(),
                     Items = collectionView
@@ -85,7 +85,7 @@ namespace Mvolonia.Controls.Tests
                 var collectionView = new CollectionView(persons);
 
 
-                var target = new GroupingListBox()
+                var target = new GroupableListBox()
                 {
                     Template = GroupingListBoxTemplate(),
                     Items = collectionView
@@ -156,12 +156,12 @@ namespace Mvolonia.Controls.Tests
 
         private FuncControlTemplate GroupingListBoxTemplate()
         {
-            return new FuncControlTemplate<GroupingListBox>((parent, scope) =>
+            return new FuncControlTemplate<GroupableListBox>((parent, scope) =>
                 new ScrollViewer
                 {
                     Name = "PART_ScrollViewer",
                     Template = ScrollViewerTemplate(),
-                    Content = new GroupingItemsPresenter
+                    Content = new GroupableItemsPresenter
                     {
                         Name = "PART_ItemsPresenter",
                         [~ItemsPresenterBase.ItemsProperty] =
@@ -169,7 +169,7 @@ namespace Mvolonia.Controls.Tests
                         [~ItemsPresenterBase.ItemsPanelProperty] =
                             parent.GetObservable(ItemsControl.ItemsPanelProperty).ToBinding(),
                         VirtualizationMode = ItemVirtualizationMode.None
-                        //[~GroupingItemsPresenter.VirtualizationModeProperty] = parent.GetObservable(GroupingListBox.VirtualizationModeProperty).ToBinding(),
+                        //[~GroupableItemsPresenter.VirtualizationModeProperty] = parent.GetObservable(GroupableListBox.VirtualizationModeProperty).ToBinding(),
                     }.RegisterInNameScope(scope)
                 }.RegisterInNameScope(scope));
         }

@@ -200,14 +200,14 @@ namespace Mvolonia.Controls.Presenters
                 switch (virtualizationMode)
                 {
                     case ItemVirtualizationMode.Simple:
-                        result = new GroupingItemVirtualizerSimple(owner);
+                        result = new GroupableItemVirtualizerSimple(owner);
                         break;
                 }
             }
         
             if (result == null)
             {
-                return new GroupingItemsVirtualizerNone(owner);
+                return new GroupableItemsVirtualizerNone(owner);
             }
         
             if (virtualizingPanel != null)

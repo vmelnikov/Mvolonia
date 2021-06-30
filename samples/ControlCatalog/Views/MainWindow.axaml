@@ -77,10 +77,10 @@
             <Button Command="{Binding OnChangeSelectedSecondNameCommand}">Change SecondName</Button>
             
         </StackPanel>
-        <mvo:GroupingListBox Items="{Binding GroupedEmployees}"
+        <mvo:GroupableListBox Items="{Binding GroupedEmployees}"
                              SelectedItems="{Binding SelectedItems}"
                              SelectionMode="Multiple">
-            <mvo:GroupingListBox.GroupStyle>
+            <mvo:GroupableListBox.GroupStyle>
                 <mvo:GroupStyle>
                     <mvo:GroupStyle.HeaderTemplate>
                         <DataTemplate>
@@ -100,15 +100,15 @@
                         </DataTemplate>
                     </mvo:GroupStyle.HeaderTemplate>
                 </mvo:GroupStyle>
-            </mvo:GroupingListBox.GroupStyle>
-            <mvo:GroupingListBox.ItemTemplate>
+            </mvo:GroupableListBox.GroupStyle>
+            <mvo:GroupableListBox.ItemTemplate>
                 <DataTemplate DataType="m:Employee">
                     <DockPanel>
                         <TextBlock DockPanel.Dock="Left" Text="{Binding SecondName}" Margin="0, 0, 5, 0" />
                         <TextBlock Text="{Binding FirstName}" />
                     </DockPanel>
                 </DataTemplate>
-            </mvo:GroupingListBox.ItemTemplate>
-        </mvo:GroupingListBox>
+            </mvo:GroupableListBox.ItemTemplate>
+        </mvo:GroupableListBox>
     </DockPanel>
 </Window>

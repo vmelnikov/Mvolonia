@@ -1,6 +1,6 @@
 namespace Mvolonia.Controls.Generators
 {
-    internal interface IGroupingItemContainerGenerator
+    internal interface IGroupableItemContainerGenerator
     { 
         GroupStyle GroupStyle { get; }
     }

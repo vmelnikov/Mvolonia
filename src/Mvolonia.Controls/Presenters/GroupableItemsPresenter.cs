@@ -9,7 +9,7 @@ using Avalonia.Input;
 
 namespace Mvolonia.Controls.Presenters
 {
-    public class GroupingItemsPresenter : ItemsPresenterBase, IItemContainerGeneratorHolder, ILogicalScrollable
+    public class GroupableItemsPresenter : ItemsPresenterBase, IItemContainerGeneratorHolder, ILogicalScrollable
     {
         private const double ScrollViewerDefaultSmallChange = 16;
         
@@ -28,14 +28,14 @@ namespace Mvolonia.Controls.Presenters
         /// <summary>
         /// Initializes static members of the <see cref="ItemsPresenter"/> class.
         /// </summary>
-        static GroupingItemsPresenter()
+        static GroupableItemsPresenter()
         {
             KeyboardNavigation.TabNavigationProperty.OverrideDefaultValue(
-                typeof(GroupingItemsPresenter),
+                typeof(GroupableItemsPresenter),
                 KeyboardNavigationMode.Once);
 
             VirtualizationModeProperty.Changed
-                .AddClassHandler<GroupingItemsPresenter>((x, e) => x.VirtualizationModeChanged(e));
+                .AddClassHandler<GroupableItemsPresenter>((x, e) => x.VirtualizationModeChanged(e));
         }
 
         /// <summary>

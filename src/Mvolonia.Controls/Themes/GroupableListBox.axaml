@@ -4,15 +4,15 @@
         xmlns:c="clr-namespace:Mvolonia.Controls;assembly=Mvolonia.Controls">
     <Design.PreviewWith>
         <Border Padding="20">
-            <c:GroupingListBox>
+            <c:GroupableListBox>
                 <ListBoxItem>Test</ListBoxItem>
                 <ListBoxItem>Test</ListBoxItem>
                 <ListBoxItem>Test</ListBoxItem>
                 <ListBoxItem>Test</ListBoxItem>
-            </c:GroupingListBox>
+            </c:GroupableListBox>
         </Border>
     </Design.PreviewWith>
-    <Style Selector="c|GroupingListBox">
+    <Style Selector="c|GroupableListBox">
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
         <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
@@ -28,7 +28,7 @@
                                   Background="{TemplateBinding Background}"
                                   HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
                                   VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
-                        <p:GroupingItemsPresenter Name="PART_ItemsPresenter"
+                        <p:GroupableItemsPresenter Name="PART_ItemsPresenter"
                                         Items="{TemplateBinding Items}"
                                         ItemsPanel="{TemplateBinding ItemsPanel}"
                                         ItemTemplate="{TemplateBinding ItemTemplate}"

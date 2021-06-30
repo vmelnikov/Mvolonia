@@ -68,7 +68,7 @@ namespace Mvolonia.Controls
                 return;
             if (ViewGroup is null)
                 return;
-            var host = GetParent<IGroupingItemsGeneratorHost>();
+            var host = GetParent<IGroupableItemsGeneratorHost>();
             var groupStyle = host?.GetGroupStyle(_level);
             contentPresenter.Content = BuildHeaderContent(groupStyle);
             contentPresenter.DataContext = ViewGroup;

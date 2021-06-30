@@ -10,9 +10,9 @@ using Mvolonia.Controls.Collections;
 
 namespace Mvolonia.Controls.Presenters
 {
-    public class GroupingItemsVirtualizerNone : ItemVirtualizerBase
+    public class GroupableItemsVirtualizerNone : ItemVirtualizerBase
     {
-        public GroupingItemsVirtualizerNone(IItemsPresenter owner)
+        public GroupableItemsVirtualizerNone(IItemsPresenter owner)
             : base(owner)
         {
             if (Items != null && owner.Panel != null)

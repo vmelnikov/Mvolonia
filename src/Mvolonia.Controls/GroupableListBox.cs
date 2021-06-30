@@ -6,7 +6,7 @@ using Mvolonia.Controls.Generators;
 namespace Mvolonia.Controls
 {
     
-    public class GroupingListBox : ListBox, IGroupingItemsGeneratorHost
+    public class GroupableListBox : ListBox, IGroupableItemsGeneratorHost
     {
         /// <summary>
         /// The collection of GroupStyle objects that describes the display of

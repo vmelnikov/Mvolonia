@@ -1,6 +1,6 @@
 namespace Mvolonia.Controls
 {
-    public interface IGroupingItemsGeneratorHost
+    public interface IGroupableItemsGeneratorHost
     {
         GroupStyle GetGroupStyle(int level);
     }

@@ -6,7 +6,7 @@ using Mvolonia.Controls.Collections;
 
 namespace Mvolonia.Controls.Generators
 {
-    public class GroupItemContainerGenerator : ItemContainerGenerator<ListBoxItem>, IGroupingItemContainerGenerator
+    public class GroupItemContainerGenerator : ItemContainerGenerator<ListBoxItem>, IGroupableItemContainerGenerator
     {
         public GroupItemContainerGenerator(IControl owner, AvaloniaProperty contentProperty, AvaloniaProperty contentTemplateProperty) : base(owner, contentProperty, contentTemplateProperty)
         {

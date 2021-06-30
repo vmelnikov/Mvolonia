@@ -21,7 +21,7 @@ namespace Mvolonia.Controls.Presenters
     /// Handles virtualization in an <see cref="ItemsPresenter"/> for
     /// <see cref="ItemVirtualizationMode.Simple"/>.
     /// </summary>
-    internal class GroupingItemVirtualizerSimple : ItemVirtualizerBase
+    internal class GroupableItemVirtualizerSimple : ItemVirtualizerBase
     {
         private int _anchor;
 
@@ -29,7 +29,7 @@ namespace Mvolonia.Controls.Presenters
         /// Initializes a new instance of the <see cref="ItemVirtualizerSimple"/> class.
         /// </summary>
         /// <param name="owner"></param>
-        public GroupingItemVirtualizerSimple(IItemsPresenter owner)
+        public GroupableItemVirtualizerSimple(IItemsPresenter owner)
             : base(owner)
         {
             // Don't need to add children here as UpdateControls should be called by the panel

@@ -12,7 +12,7 @@ namespace Mvolonia.Controls
             AvaloniaProperty.Register<GroupStyle, IDataTemplate>(nameof(HeaderTemplate));
         
         /// <summary>
-        /// Gets or sets the data template used to display the group headers in GroupingListBox.
+        /// Gets or sets the data template used to display the group headers in GroupableListBox.
         /// </summary>
         public IDataTemplate HeaderTemplate
         {
