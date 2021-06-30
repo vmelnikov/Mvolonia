@@ -2,6 +2,13 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <VersionPrefix>0.10.5</VersionPrefix>
+        <VersionSuffix>preview1</VersionSuffix>
+        <Authors>Vadim Melnikov</Authors>
+        <Company>Vadim Melnikov</Company>
+        <Copyright>Copyright © Vadim Melnikov 2021</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/vmelnikov/Mvolonia</PackageProjectUrl>
     </PropertyGroup>
 
     <Import Project="..\..\build\Avalonia.props" />
