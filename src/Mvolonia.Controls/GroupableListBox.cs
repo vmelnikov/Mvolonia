@@ -40,8 +40,8 @@ namespace Mvolonia.Controls
                 {
                     return;
                 }
-                
-                var current = focus.Current as IControl;
+
+                var current = GetListBoxItem(focus.Current as IControl);
 
                 var index = ItemContainerGenerator?.IndexFromContainer(current) ?? -1;
                 if (index == -1)
@@ -55,6 +55,18 @@ namespace Mvolonia.Controls
             }
 
             base.OnKeyDown(e);
+        }
+
+        private static IControl GetListBoxItem(IControl current)
+        {
+            while (current is not null)
+            {
+                if (current is ListBoxItem)
+                    return current;
+                current = current.Parent;
+            }
+
+            return null;
         }
 
         private IInputElement GetNextControlFromGenerator(NavigationDirection direction, int index)
