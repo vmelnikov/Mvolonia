@@ -8,6 +8,7 @@
         <Copyright>Copyright © Vadim Melnikov 2021</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/vmelnikov/Mvolonia</PackageProjectUrl>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <Import Project="..\..\build\Avalonia.props" />

@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
+using Avalonia.Input;
+using Avalonia.VisualTree;
 using Mvolonia.Controls.Generators;
 
 namespace Mvolonia.Controls
@@ -23,6 +25,49 @@ namespace Mvolonia.Controls
                 this, 
                 ContentControl.ContentProperty,
                 ContentControl.ContentTemplateProperty);
+        }
+        
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                var focus = FocusManager.Instance;
+                var direction = e.Key.ToNavigationDirection();
+
+                if (focus.Current is null ||
+                    direction is null ||
+                    direction.Value.IsTab())
+                {
+                    return;
+                }
+                
+                var current = focus.Current as IControl;
+
+                var index = ItemContainerGenerator?.IndexFromContainer(current) ?? -1;
+                if (index == -1)
+                    return;
+
+                var next = GetNextControlFromGenerator(direction.Value, index);
+                if (next is null)
+                    return;
+                focus.Focus(next, NavigationMethod.Directional, e.KeyModifiers);
+                e.Handled = true;
+            }
+
+            base.OnKeyDown(e);
+        }
+
+        private IInputElement GetNextControlFromGenerator(NavigationDirection direction, int index)
+        {
+            if (ItemContainerGenerator is null)
+                return null;
+            var nextIndex = direction switch
+            {
+                NavigationDirection.Down => index + 1,
+                NavigationDirection.Up => index - 1,
+                   _ => index
+            };
+            return ItemContainerGenerator?.ContainerFromIndex(nextIndex);
         }
 
         protected override void OnContainersMaterialized(ItemContainerEventArgs e)
