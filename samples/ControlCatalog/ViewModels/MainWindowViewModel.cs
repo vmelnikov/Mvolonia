@@ -18,8 +18,8 @@ namespace ControlCatalog.ViewModels
 
         public MainWindowViewModel()
         {
-            FillDefaultEmployees();
             GroupedEmployees = CreateGroupedEmployees(_employees);
+            FillDefaultEmployees();
             SelectedItems.CollectionChanged += (sender, args) => { };
         }
 
@@ -102,11 +102,15 @@ namespace ControlCatalog.ViewModels
 
         private void FillDefaultEmployees()
         {
-            _employees.Add(new Employee("Ivan", "Ivanov", "Roga & Kopyta", "Male"));
-            _employees.Add(new Employee("Petr", "Petrov", "Roga & Kopyta", "Male"));
-            _employees.Add(new Employee("Raisa", "Ivanovna", "Roga & Kopyta", "Female"));
-            _employees.Add(new Employee("Petr", "Ivanov", "Only Male Company", "Male"));
-            _employees.Add(new Employee("Elena", "Petrovna", "Only Female Company", "Female"));
+            var toAdd = new List<Employee>
+            {
+                new Employee("Ivan", "Ivanov", "Roga & Kopyta", "Male"),
+                new Employee("Petr", "Petrov", "Roga & Kopyta", "Male"),
+                new Employee("Raisa", "Ivanovna", "Roga & Kopyta", "Female"),
+                new Employee("Petr", "Ivanov", "Only Male Company", "Male"),
+                new Employee("Elena", "Petrovna", "Only Female Company", "Female")
+            };
+            _employees.AddRange(toAdd);
         }
     }
 }

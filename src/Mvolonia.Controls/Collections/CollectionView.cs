@@ -172,21 +172,21 @@ namespace Mvolonia.Controls.Collections
 
         private void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
-            var addedItem = args.NewItems?[0];
-            var removedItem = args.OldItems?[0];
+            var addedItems = args.NewItems;
+            var removedItems = args.OldItems;
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    ProcessAddEvent(addedItem, args.NewStartingIndex);
+                    ProcessAddItemsEvent(addedItems, args.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    ProcessRemoveEvent(removedItem);
+                    ProcessRemoveItemsEvent(removedItems);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    ProcessRemoveEvent(removedItem);
-                    ProcessAddEvent(addedItem, args.NewStartingIndex);
+                    ProcessRemoveItemsEvent(removedItems);
+                    ProcessAddItemsEvent(addedItems, args.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     ProcessResetEvent();
@@ -198,13 +198,26 @@ namespace Mvolonia.Controls.Collections
             if (args.Action != NotifyCollectionChangedAction.Replace)
                 OnPropertyChanged(nameof(Count));
         }
-        
+
+        private void ProcessRemoveItemsEvent(IList removedItems)
+        {
+            foreach (var item in removedItems)
+                ProcessRemoveItemEvent(item);
+        }
+
+
+        private void ProcessAddItemsEvent(IEnumerable addedItems, int index)
+        {
+            foreach (var item in addedItems)
+                ProcessAddItemEvent(item, index++);
+        }
+
 
         private void ProcessResetEvent() =>
             Refresh();
 
 
-        private void ProcessAddEvent(object item, int index)
+        private void ProcessAddItemEvent(object item, int index)
         {
             ProcessInsertToCollection(item, index);
 
@@ -225,19 +238,19 @@ namespace Mvolonia.Controls.Collections
                     index));
         }
 
-        private void ProcessRemoveEvent(object value)
+        private void ProcessRemoveItemEvent(object item)
         {
-            var index = IndexOf(value);
+            var index = IndexOf(item);
             if (index < 0)
                 return;
-            _internalList.Remove(value);
-            _rootGroup.RemoveFromSubgroups(value);
+            _internalList.Remove(item);
+            _rootGroup.RemoveFromSubgroups(item);
 
 
             OnCollectionChanged(
                 new NotifyCollectionChangedEventArgs(
                     NotifyCollectionChangedAction.Remove,
-                    value,
+                    item,
                     index));
         }
 
