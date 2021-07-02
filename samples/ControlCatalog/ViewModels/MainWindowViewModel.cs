@@ -72,18 +72,13 @@ namespace ControlCatalog.ViewModels
         {
             var faker = new Faker<string>().CustomInstantiator(f => f.Name.LastName());
             var selectedItems = SelectedItems.ToList();
-            SelectedItems.Clear();
-            var toAdd = new List<Employee>();
             foreach (var selectedItem in selectedItems)
             {
                 var index = _employees.IndexOf(selectedItem);
                 var newItem = new Employee(selectedItem.FirstName, faker.Generate(), selectedItem.Company,
                     selectedItem.Gender);
                 _employees[index] = newItem;
-                toAdd.Add(_employees[index]);
             }
-
-            SelectedItems.AddRange(toAdd);
         }
 
         public void AddNewMaleCommand(string company)

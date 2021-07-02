@@ -10,7 +10,7 @@ using Mvolonia.Controls.Collections.Comparers;
 
 namespace Mvolonia.Controls.Collections
 {
-    public class CollectionView : ICollectionView, IList<object>, INotifyPropertyChanged
+    public class CollectionView : ICollectionViewInternal, IList<object>, INotifyPropertyChanged
     {
         private IList _internalList;
 
@@ -124,7 +124,7 @@ namespace Mvolonia.Controls.Collections
             }
         }
 
-        private IEnumerable SourceCollection { get; }
+        public IEnumerable SourceCollection { get; }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -172,6 +172,7 @@ namespace Mvolonia.Controls.Collections
 
         private void ProcessCollectionChanged(NotifyCollectionChangedEventArgs args)
         {
+            CurrentSourceCollectionChangedArgs = args;
             var addedItems = args.NewItems;
             var removedItems = args.OldItems;
             switch (args.Action)
@@ -197,7 +198,10 @@ namespace Mvolonia.Controls.Collections
 
             if (args.Action != NotifyCollectionChangedAction.Replace)
                 OnPropertyChanged(nameof(Count));
+            CurrentSourceCollectionChangedArgs = null;
         }
+
+        public NotifyCollectionChangedEventArgs CurrentSourceCollectionChangedArgs { get; private set; }
 
         private void ProcessRemoveItemsEvent(IList removedItems)
         {
