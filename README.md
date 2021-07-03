@@ -11,7 +11,7 @@ Mvolonia is a Controls Library for [Avalonia UI Framework](http://avaloniaui.net
 
 GroupableListBox is a ListBox that supports Grouping and Sorting
 
-[![GroupableListBox](images/GroupableListBox.png)](images/GroupableListBox.png)
+<img src="images/GroupableListBox.png" width="495"/>
 
 # Usage
 
