@@ -15,7 +15,7 @@ namespace ControlCatalog.Models
         public string SecondName { get; }
 
         public string FirstName { get; }
-        
+
         public string Gender { get; }
-    }       
+    }
 }

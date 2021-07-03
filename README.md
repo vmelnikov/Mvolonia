@@ -7,6 +7,12 @@
 
 Mvolonia is a Controls Library for [Avalonia UI Framework](http://avaloniaui.net/).
 
+### GroupableListBox
+
+GroupableListBox is a ListBox that supports Grouping and Sorting
+
+[![GroupableListBox](images/GroupableListBox.png)](images/GroupableListBox.png)
+
 # Usage
 
 [Usage instructions](https://github.com/vmelnikov/Mvolonia/wiki/Usage).
@@ -20,4 +26,4 @@ You can find the packages here [NuGet](https://www.nuget.org/packages/Mvolonia.C
 
 # License
 
-ThemeEditor is licensed under the [MIT license](LICENSE.TXT).
+Mvolonia is licensed under the [MIT license](LICENSE).
