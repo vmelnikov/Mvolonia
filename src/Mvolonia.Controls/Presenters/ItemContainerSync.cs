@@ -153,10 +153,13 @@ namespace Mvolonia.Controls.Presenters
                     continue;
                 var groupItem = new GroupItem
                 {
-                    ViewGroup = group
+                    DataContext = group
                 };
+                
                 panel.Children.Insert(index, groupItem);
+                groupItem.PrepareItemContainer(GetParent<IGroupableItemsGeneratorHost>(panel));
                 groupItem.ApplyTemplate();
+                
                 AddGroupItemsToPanel(groupItem.Panel, 0, group.Items);
                 index++;
             }
@@ -212,14 +215,15 @@ namespace Mvolonia.Controls.Presenters
             if (!(group is CollectionViewGroupInternal groupInternal))
                 throw new ArgumentException();
             var groupItem = panel.Children.OfType<GroupItem>()
-                .FirstOrDefault(c => Equals(c.ViewGroup, group));
+                .FirstOrDefault(c => Equals(c.DataContext, group));
 
             if (!(groupItem is null))
                 return groupItem;
             groupItem = new GroupItem
             {
-                ViewGroup = group
+                DataContext = group
             };
+            groupItem.PrepareItemContainer(GetParent<IGroupableItemsGeneratorHost>(panel));
             var index = groupInternal.Parent?.Items.IndexOf(group) ?? -1;
             if (index < 0 || index > panel.Children.Count)
                 index = panel.Children.Count;
@@ -277,14 +281,28 @@ namespace Mvolonia.Controls.Presenters
 
         private static void CheckAndRemoveGroupItem(IItemsPresenter owner, IPanel panel, IGroupItem groupItem)
         {
-            if (!(owner.Items is ICollectionView collectionView))
+            if (owner.Items is not ICollectionView collectionView)
                 return;
             if (!groupItem.IsEmpty)
                 return;
-            if (collectionView.ContainsGroup(groupItem.ViewGroup))
+            if (groupItem.DataContext is not CollectionViewGroup viewGroup)
+                return;
+            if (collectionView.ContainsGroup(viewGroup))
                 return;
 
             panel.Children.Remove(groupItem);
+        }
+        
+        private static T GetParent<T>(IControl control) where T: class
+        {
+            while (control.Parent is not null)
+            {
+                control = control.Parent;
+                if (control is T t)
+                    return t;
+            }
+
+            return null;
         }
     }
 }

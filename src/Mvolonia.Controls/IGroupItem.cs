@@ -9,9 +9,7 @@ namespace Mvolonia.Controls
         /// Indicates whether GroupItem has no children
         /// </summary>
         bool IsEmpty { get; }
-        
-        CollectionViewGroup ViewGroup { get; }
-        
+
         IPanel Panel { get; }
     }
 }
