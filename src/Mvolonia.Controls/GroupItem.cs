@@ -1,6 +1,8 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Styling;
 using Mvolonia.Controls.Collections;
 
 namespace Mvolonia.Controls
@@ -9,7 +11,6 @@ namespace Mvolonia.Controls
     public class GroupItem : TemplatedControl, IGroupItem
     {
         private Control _header;
-        private CollectionViewGroup _viewGroup;
         private int _level;
 
         /// <inheritdoc/>
@@ -17,20 +18,19 @@ namespace Mvolonia.Controls
 
         public IPanel Panel { get; private set; }
 
-        internal CollectionViewGroup ViewGroup
+
+        internal void PrepareItemContainer(IGroupableItemsGeneratorHost host)
         {
-            get => _viewGroup;
-            set
-            {
-                if (_viewGroup == value)
-                    return;
-                _viewGroup = value;
-                _level = GetViewGroupLevel(value as CollectionViewGroupInternal);
-                UpdateHeader();
-            }
+            var groupStyle = host?.GetGroupStyle(_level);
+            groupStyle?.ContainerStyle?.TryAttach(this, host as IStyleHost);
         }
 
-        CollectionViewGroup IGroupItem.ViewGroup => _viewGroup;
+        protected override void OnDataContextChanged(EventArgs e)
+        {
+            _level = GetViewGroupLevel(DataContext as CollectionViewGroupInternal);
+            UpdateHeader();
+            base.OnDataContextChanged(e);
+        }
 
         private static int GetViewGroupLevel(CollectionViewGroupInternal group)
         {
@@ -64,14 +64,14 @@ namespace Mvolonia.Controls
 
         private void UpdateHeader()
         {
-            if (! (_header is ContentPresenter contentPresenter))
+            if (_header is not ContentPresenter contentPresenter)
                 return;
-            if (ViewGroup is null)
+            if (DataContext is null)
                 return;
             var host = GetParent<IGroupableItemsGeneratorHost>();
             var groupStyle = host?.GetGroupStyle(_level);
             contentPresenter.Content = BuildHeaderContent(groupStyle);
-            contentPresenter.DataContext = ViewGroup;
+            contentPresenter.DataContext = DataContext;
         }
 
         private object BuildHeaderContent(GroupStyle groupStyle)
@@ -79,16 +79,16 @@ namespace Mvolonia.Controls
             if (groupStyle is null)
                 return new TextBlock()
                 {
-                    Text = ViewGroup.Key.ToString()
+                    Text = (DataContext as CollectionViewGroup)?.Key.ToString()
                 };
-            return groupStyle.HeaderTemplate.Build(ViewGroup);
+            return groupStyle.HeaderTemplate?.Build(DataContext);
         }
 
 
         private T GetParent<T>() where T: class
         {
             IControl control = this;
-            while (!(control.Parent is null))
+            while (control.Parent is not null)
             {
                 control = control.Parent;
                 if (control is T t)

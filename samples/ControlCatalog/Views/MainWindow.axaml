@@ -82,6 +82,22 @@
                              SelectionMode="Multiple">
             <mvo:GroupableListBox.GroupStyle>
                 <mvo:GroupStyle>
+                    <mvo:GroupStyle.ContainerStyle>
+                        <Style Selector="mvo|GroupItem">
+                            <Setter Property="Background" Value="Red"/>
+                            <Setter Property="Template">
+                                <ControlTemplate>
+                                    <DockPanel>
+                                        <ContentPresenter DockPanel.Dock="Top" Name="PART_Header" />
+                                        <Panel MinHeight="50">
+                                            <TextBlock Text="Use 'Add Male' or 'Add Female' button to create new Employee" IsVisible="{Binding !ItemCount}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                            <StackPanel Name="PART_Panel"/>
+                                        </Panel>
+                                    </DockPanel>
+                                </ControlTemplate>
+                            </Setter>
+                        </Style>
+                    </mvo:GroupStyle.ContainerStyle>
                     <mvo:GroupStyle.HeaderTemplate>
                         <DataTemplate>
                             <ContentControl
