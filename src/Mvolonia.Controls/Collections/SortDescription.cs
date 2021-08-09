@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -15,10 +16,14 @@ namespace Mvolonia.Controls.Collections
             ListSortDirection direction = ListSortDirection.Ascending, CultureInfo culture = null) =>
             new PropertySortDescription(propertyName, direction, culture);
 
+        public static SortDescription FromComparer(IComparer comparer,
+            ListSortDirection direction = ListSortDirection.Ascending) =>
+            new ComparerSortDescription(comparer, direction);
+
 
         private ListSortDirection _direction;
 
-        public SortDescription(ListSortDirection direction)
+        protected SortDescription(ListSortDirection direction)
         {
             if (direction != ListSortDirection.Ascending && direction != ListSortDirection.Descending)
                 throw new InvalidEnumArgumentException(nameof(direction), (int) direction, typeof(ListSortDirection));
@@ -58,9 +63,8 @@ namespace Mvolonia.Controls.Collections
 
         public IEnumerable<object> OrderBy(IEnumerable<object> seq) =>
             seq.OrderBy(o => o, Comparer);
-        
+
         public IEnumerable<object> ThenBy(IOrderedEnumerable<object> seq) =>
             seq.ThenBy(o => o, Comparer);
-        
     }
 }
