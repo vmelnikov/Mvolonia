@@ -281,7 +281,7 @@ namespace Mvolonia.Controls.Collections
                     (index > 0 &&
                      (sortFieldComparer.Compare(item, InternalItemAt(index - 1)) <
                       0)) || /* item has moved up in the list */
-                    ((index < _internalList.Count - 1) &&
+                    ((index < _internalList.Count) &&
                      (sortFieldComparer.Compare(item, InternalItemAt(index)) >
                       0))) /* item has moved down in the list */
                 {
