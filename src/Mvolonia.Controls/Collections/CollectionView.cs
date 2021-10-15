@@ -186,8 +186,7 @@ namespace Mvolonia.Controls.Collections
                     ProcessRemoveItemsEvent(removedItems);
                     break;
                 case NotifyCollectionChangedAction.Replace:
-                    ProcessRemoveItemsEvent(removedItems);
-                    ProcessAddItemsEvent(addedItems, args.NewStartingIndex);
+                    ProcessReplaceItemsEvent(removedItems, addedItems, args.NewStartingIndex);
                     break;
                 case NotifyCollectionChangedAction.Reset:
                     ProcessResetEvent();
@@ -199,6 +198,20 @@ namespace Mvolonia.Controls.Collections
             if (args.Action != NotifyCollectionChangedAction.Replace)
                 OnPropertyChanged(nameof(Count));
             CurrentSourceCollectionChangedArgs = null;
+        }
+
+        private void ProcessReplaceItemsEvent(IList removedItems, IList addedItems, int index)
+        {
+            var oldIndex = IndexOf(removedItems[0]);
+            ProcessRemoveItemEvent(removedItems[0], true);
+            ProcessAddItemEvent(addedItems[0], index, true);
+            var newIndex = IndexOf(addedItems[0]);
+            OnCollectionChanged(
+                new NotifyCollectionChangedEventArgs(
+                    NotifyCollectionChangedAction.Replace,
+                    addedItems,
+                    removedItems,
+                    oldIndex));
         }
 
         public NotifyCollectionChangedEventArgs CurrentSourceCollectionChangedArgs { get; private set; }
@@ -221,7 +234,7 @@ namespace Mvolonia.Controls.Collections
             Refresh();
 
 
-        private void ProcessAddItemEvent(object item, int index)
+        private void ProcessAddItemEvent(object item, int index, bool isReplace = false)
         {
             ProcessInsertToCollection(item, index);
 
@@ -234,6 +247,9 @@ namespace Mvolonia.Controls.Collections
 
             if (index < 0)
                 return;
+            
+            if (isReplace)
+                return;
 
             OnCollectionChanged(
                 new NotifyCollectionChangedEventArgs(
@@ -242,7 +258,7 @@ namespace Mvolonia.Controls.Collections
                     index));
         }
 
-        private void ProcessRemoveItemEvent(object item)
+        private void ProcessRemoveItemEvent(object item, bool isReplace = false)
         {
             var index = IndexOf(item);
             if (index < 0)
@@ -250,7 +266,8 @@ namespace Mvolonia.Controls.Collections
             _internalList.Remove(item);
             _rootGroup.RemoveFromSubgroups(item);
 
-
+            if (isReplace)
+                return;
             OnCollectionChanged(
                 new NotifyCollectionChangedEventArgs(
                     NotifyCollectionChangedAction.Remove,
@@ -310,7 +327,7 @@ namespace Mvolonia.Controls.Collections
             return index;
         }
 
-        private void Refresh()
+        public void Refresh()
         {
             IsGrouping = false;
             CopySourceToInternalList();
@@ -318,6 +335,10 @@ namespace Mvolonia.Controls.Collections
                 return;
             SortInternalList();
             PrepareGroups();
+            OnCollectionChanged(
+                new NotifyCollectionChangedEventArgs(
+                    NotifyCollectionChangedAction.Reset));
+
         }
 
         /// <summary>
