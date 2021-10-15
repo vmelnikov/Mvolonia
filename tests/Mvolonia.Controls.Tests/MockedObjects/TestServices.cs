@@ -23,7 +23,7 @@ namespace Mvolonia.Controls.Tests.MockedObjects
             assetLoader: new AssetLoader(),
             platform: new AppBuilder().RuntimePlatform,
         //    renderInterface: new MockPlatformRenderInterface(),
-            standardCursorFactory: Mock.Of<IStandardCursorFactory>(),
+            //standardCursorFactory: Mock.Of<IStandardCursorFactory>(),
             styler: new Styler(),
             theme: () => CreateDefaultTheme(),
             threadingInterface: Mock.Of<IPlatformThreadingInterface>(x => x.CurrentThreadIsLoopThread == true)
@@ -74,7 +74,6 @@ namespace Mvolonia.Controls.Tests.MockedObjects
             IPlatformRenderInterface renderInterface = null,
             IRenderTimer renderLoop = null,
             IScheduler scheduler = null,
-            IStandardCursorFactory standardCursorFactory = null,
             IStyler styler = null,
             Func<Styles> theme = null,
             IPlatformThreadingInterface threadingInterface = null,
@@ -95,7 +94,6 @@ namespace Mvolonia.Controls.Tests.MockedObjects
             FontManagerImpl = fontManagerImpl;
             TextShaperImpl = textShaperImpl;
             Scheduler = scheduler;
-            StandardCursorFactory = standardCursorFactory;
             Styler = styler;
             Theme = theme;
             ThreadingInterface = threadingInterface;
@@ -115,7 +113,6 @@ namespace Mvolonia.Controls.Tests.MockedObjects
         public IFontManagerImpl FontManagerImpl { get; }
         public ITextShaperImpl TextShaperImpl { get; }
         public IScheduler Scheduler { get; }
-        public IStandardCursorFactory StandardCursorFactory { get; }
         public IStyler Styler { get; }
         public Func<Styles> Theme { get; }
         public IPlatformThreadingInterface ThreadingInterface { get; }
@@ -134,7 +131,6 @@ namespace Mvolonia.Controls.Tests.MockedObjects
             IPlatformRenderInterface renderInterface = null,
             IRenderTimer renderLoop = null,
             IScheduler scheduler = null,
-            IStandardCursorFactory standardCursorFactory = null,
             IStyler styler = null,
             Func<Styles> theme = null,
             IPlatformThreadingInterface threadingInterface = null,
@@ -156,7 +152,6 @@ namespace Mvolonia.Controls.Tests.MockedObjects
                 fontManagerImpl: fontManagerImpl ?? FontManagerImpl,
                 textShaperImpl: textShaperImpl ?? TextShaperImpl,
                 scheduler: scheduler ?? Scheduler,
-                standardCursorFactory: standardCursorFactory ?? StandardCursorFactory,
                 styler: styler ?? Styler,
                 theme: theme ?? Theme,
                 threadingInterface: threadingInterface ?? ThreadingInterface,

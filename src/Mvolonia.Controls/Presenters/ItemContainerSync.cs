@@ -41,6 +41,17 @@ namespace Mvolonia.Controls.Presenters
                 RemoveContainers(owner, generator.RemoveRange(e.OldStartingIndex, e.OldItems.Count));
             }
 
+            void Replace()
+            {
+                var oldContainerInfo = generator.Dematerialize(e.OldStartingIndex, 1).FirstOrDefault();
+                var newContainerInfo = generator.Materialize(e.NewStartingIndex, e.NewItems[0]);
+                if (oldContainerInfo is null)
+                    return;
+                if (newContainerInfo is null)
+                    return;
+                ReplaceContainer(panel, oldContainerInfo, newContainerInfo);
+            }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -52,16 +63,7 @@ namespace Mvolonia.Controls.Presenters
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    RemoveContainers(owner, generator.Dematerialize(e.OldStartingIndex, e.OldItems.Count));
-                    var containers = AddContainers(owner, e.NewStartingIndex, e.NewItems);
-
-                    var i = e.NewStartingIndex;
-
-                    foreach (var container in containers)
-                    {
-                        panel.Children[i++] = container.ContainerControl;
-                    }
-
+                    Replace();
                     break;
 
                 case NotifyCollectionChangedAction.Move:
@@ -74,12 +76,33 @@ namespace Mvolonia.Controls.Presenters
 
                     if (items != null)
                     {
+                        FillExplicitGroupItems(owner);
                         AddContainers(owner, 0, items);
                     }
 
                     break;
             }
         }
+
+        private static void ReplaceContainer(IPanel panel, ItemContainerInfo oldContainerInfo, ItemContainerInfo newContainerInfo)
+        {
+            var children = panel?.Children;
+            if (children is null)
+                return;
+            for (var i = 0; i < children.Count; i++)
+            {
+                
+                if (children[i] is GroupItem groupItem)
+                {
+                    ReplaceContainer(groupItem.Panel, oldContainerInfo, newContainerInfo);
+                    continue;
+                }
+                if (!children[i].Equals(oldContainerInfo.ContainerControl))
+                    continue;
+                panel.Children[i] = newContainerInfo.ContainerControl;
+            }
+        }
+
 
         public static void FillExplicitGroupItems(IItemsPresenter owner)
         {

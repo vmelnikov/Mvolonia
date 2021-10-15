@@ -20,7 +20,6 @@ namespace ControlCatalog.ViewModels
         {
             GroupedEmployees = CreateGroupedEmployees(_employees);
             FillDefaultEmployees();
-            SelectedItems.CollectionChanged += (sender, args) => { };
         }
 
         public AvaloniaList<Employee> SelectedItems { get; } = new();
@@ -71,14 +70,10 @@ namespace ControlCatalog.ViewModels
         private void ChangeSelectedSecondName()
         {
             var faker = new Faker<string>().CustomInstantiator(f => f.Name.LastName());
-            var selectedItems = SelectedItems.ToList();
-            foreach (var selectedItem in selectedItems)
-            {
-                var index = _employees.IndexOf(selectedItem);
-                var newItem = new Employee(selectedItem.FirstName, faker.Generate(), selectedItem.Company,
-                    selectedItem.Gender);
-                _employees[index] = newItem;
-            }
+            foreach (var selectedItem in SelectedItems)
+                selectedItem.SecondName = faker.Generate();
+            
+            _groupedEmployees.Refresh();
         }
 
         public void AddNewMaleCommand(string company)

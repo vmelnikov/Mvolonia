@@ -12,7 +12,7 @@ namespace ControlCatalog.Models
 
         public string Company { get; }
 
-        public string SecondName { get; }
+        public string SecondName { get; set; }
 
         public string FirstName { get; }
 
