@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Version>0.10.8-preview1</Version>
+        <Version>0.10.7-preview1</Version>
         <Authors>Vadim Melnikov</Authors>
         <Company>Vadim Melnikov</Company>
         <Copyright>Copyright © Vadim Melnikov 2021</Copyright>
