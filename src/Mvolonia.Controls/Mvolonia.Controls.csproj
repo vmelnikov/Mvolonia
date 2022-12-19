@@ -2,10 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Version>0.10.8-preview1</Version>
+        <Version>0.10.8-preview2</Version>
         <Authors>Vadim Melnikov</Authors>
         <Company>Vadim Melnikov</Company>
-        <Copyright>Copyright © Vadim Melnikov 2021</Copyright>
+        <Copyright>Copyright © Vadim Melnikov 2022</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/vmelnikov/Mvolonia</PackageProjectUrl>
         <LangVersion>latest</LangVersion>
