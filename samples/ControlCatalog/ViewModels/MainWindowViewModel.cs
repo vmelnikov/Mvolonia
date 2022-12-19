@@ -14,7 +14,7 @@ namespace ControlCatalog.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly AvaloniaList<Employee> _employees = new();
-        private CollectionView _groupedEmployees = null!;
+        private CollectionView? _groupedEmployees;
 
         public MainWindowViewModel()
         {
@@ -24,7 +24,7 @@ namespace ControlCatalog.ViewModels
 
         public AvaloniaList<Employee> SelectedItems { get; } = new();
 
-        public CollectionView GroupedEmployees
+        public CollectionView? GroupedEmployees
         {
             get => _groupedEmployees;
             set => this.RaiseAndSetIfChanged(ref _groupedEmployees, value);
@@ -73,11 +73,12 @@ namespace ControlCatalog.ViewModels
             foreach (var selectedItem in SelectedItems)
                 selectedItem.SecondName = faker.Generate();
             
-            _groupedEmployees.Refresh();
+            _groupedEmployees?.Refresh();
         }
 
         public void AddNewMaleCommand(string company)
         {
+
             var faker = new Faker<Employee>()
                 .CustomInstantiator(f => new Employee(f.Name.FirstName(), f.Name.LastName(), company, "Male"));
             _employees.Add(faker.Generate());
@@ -94,11 +95,11 @@ namespace ControlCatalog.ViewModels
         {
             var toAdd = new List<Employee>
             {
-                new Employee("Ivan", "Ivanov", "Roga & Kopyta", "Male"),
-                new Employee("Petr", "Petrov", "Roga & Kopyta", "Male"),
-                new Employee("Raisa", "Ivanovna", "Roga & Kopyta", "Female"),
-                new Employee("Petr", "Ivanov", "Only Male Company", "Male"),
-                new Employee("Elena", "Petrovna", "Only Female Company", "Female")
+                new("Ivan", "Ivanov", "Roga & Kopyta", "Male"),
+                new("Petr", "Petrov", "Roga & Kopyta", "Male"),
+                new("Raisa", "Ivanovna", "Roga & Kopyta", "Female"),
+                new("Petr", "Ivanov", "Only Male Company", "Male"),
+                new("Elena", "Petrovna", "Only Female Company", "Female")
             };
             _employees.AddRange(toAdd);
         }

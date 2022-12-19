@@ -72,7 +72,8 @@ namespace Mvolonia.Controls.Presenters
                     break;
 
                 case NotifyCollectionChangedAction.Reset:
-                    RemoveContainers(owner, generator.Clear());
+                    generator.Clear();
+                    ClearContainers(owner);
 
                     if (items != null)
                     {
@@ -268,6 +269,9 @@ namespace Mvolonia.Controls.Presenters
             return result;
         }
 
+        private static void ClearContainers(IItemsPresenter owner) =>
+            owner?.Panel?.Children.Clear();
+
 
         private static void RemoveContainers(
             IItemsPresenter owner,
@@ -281,6 +285,8 @@ namespace Mvolonia.Controls.Presenters
                 }
             }
         }
+        
+        
 
         private static void RemoveControl(IItemsPresenter owner, IPanel panel, IControl control)
         {
@@ -305,7 +311,10 @@ namespace Mvolonia.Controls.Presenters
         private static void CheckAndRemoveGroupItem(IItemsPresenter owner, IPanel panel, IGroupItem groupItem)
         {
             if (owner.Items is not ICollectionView collectionView)
+            {
+                panel.Children.Remove(groupItem);
                 return;
+            }
             if (!groupItem.IsEmpty)
                 return;
             if (groupItem.DataContext is not CollectionViewGroup viewGroup)
